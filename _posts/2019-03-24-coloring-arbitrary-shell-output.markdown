@@ -38,7 +38,7 @@ the [Arch User Repository][6]. It doesn't have as many features as some of the
 other tools but works well and stays out of your way. Here's how the output
 typically looks:
 
-![cower uncolored output](../images/cower1.png){.img-fluid}
+![cower uncolored output](../assets/cower1.png)
 
 As you can see it can be kind of hard to find exactly what you need in all the
 text produced so I started thinking of a way to use pygments without first
@@ -94,7 +94,7 @@ All that's left is to highlight the text with our custom lexer and ensure the
 output produced is tailored to the terminal. Here's what the end result looks
 like:
 
-![cower coloured output](../images/cower2.png){.img-fluid}
+![cower coloured output](../assets/cower2.png)
 
 Looks a lot nicer doesn't it?
 

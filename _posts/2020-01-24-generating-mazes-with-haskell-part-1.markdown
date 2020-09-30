@@ -56,7 +56,7 @@ How then do we turn projecting a rectangular maze onto a graph, a Divide
 and Conquer algorithm? The answer took me a while to figure out but can
 be seen in the following image:
 
-![Divide and Conquer Graph Creation](../images/gen.png){.img-fluid}
+![Divide and Conquer Graph Creation](../assets/gen.png)
 
 From the diagram we can see that at each step two things happen:
 
@@ -81,7 +81,7 @@ the same way as a nested for loop involves traversing horizontally
 following the 'one' edges for all the nodes across the first column of 
 'two' edges[^1].
 
-![Graph with Weights](../images/gen2.png){.img-fluid}
+![Graph with Weights](../assets/gen2.png)
 
 
 ## Writing The Code
@@ -196,16 +196,16 @@ into the `outer` one.
 
 The result of running `asSquare (mazeGraph 25) 5 5` is the graph[^2]:
 
-![Square Graph](../images/graphviz.png){.img-fluid}
+![Square Graph](../assets/graphviz.png)
 
 Running the binary tree maze generation algorithm on the resulting
 'square' graph yields:
 
-![5x5 Binary Tree](../images/bt-5x5.png){.img-fluid}
+![5x5 Binary Tree](../assets/bt-5x5.png)
 
 In case you're wondering, more general rectangular mazes work as well:
 
-![20x10 Binary Tree](../images/bt-20x10.png){.img-fluid}
+![20x10 Binary Tree](../assets/bt-20x10.png)
 
 
 ## Final Thoughts

@@ -102,7 +102,7 @@ useful examples are:
 
 
 Here's a gif of our command in action
-![Command demo gif](../images/action.gif){.img-fluid}
+![Command demo gif](../assets/action.gif){.img-fluid}
 
 ## Further Reading
 
