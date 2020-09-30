@@ -1,5 +1,5 @@
 ---
-layout:default
+layout: default
 title: About
 ---
 Hello and welcome, my name is Julius and on this website I intend to write about
