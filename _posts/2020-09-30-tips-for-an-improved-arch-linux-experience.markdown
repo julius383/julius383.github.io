@@ -71,7 +71,7 @@ from the one on disk, the file from the packages is renamed with the
 overwritten during a upgrade. A message is printed during install 
 informing you of this and you should find time to merge the changes. To
 make this easier I recommend installing [`meld`][5] and `pacdiff` which is
-part of `pacman-contrib` which also contains the previously mentioned
+part of `pacman-contrib` that also contains the previously mentioned
 `rankmirrors`. `meld` is a visual diff and merge tool that's pretty handy
 to use. To resolve `.pacnew` files run
 
@@ -88,15 +88,15 @@ and `.pacnew` files.
 
 ## 3. Improving `makepkg` Compile Times and Downloading `PKGBUILD`s
 
-There is a couple of different ways to improve the performance of 
-`makepkg` as outlined on the corresponding [wiki][6] but the one I find 
-easiest to set-up is adding `ccache`. 
-`ccache` reduces the time spent on subsequent compiles after the first 
-one. Installing is done with `sudo pacman -Syu ccache` and in order to
-enable it with `makepkg` you just need to add `ccache` to the `BUILDENV`
-array inside `/etc/makepkg.conf`. How much this helps depends a lot on
-what type of software you use but it's such a small addition that it's
-a shame not to use.
+There are a couple of different ways to improve the performance of 
+`makepkg` as outlined on the corresponding [wiki][6] page but the one I 
+find easiest to set-up is adding `ccache`. `ccache` reduces the time 
+spent on subsequent compiles after the first one. Installing is done with 
+`sudo pacman -Syu ccache` and in order to enable it with `makepkg` you 
+just need to add `ccache` to the `BUILDENV` array inside 
+`/etc/makepkg.conf`. How much this helps depends a lot on what type of 
+software you use but it's such a small addition that it's a shame not to 
+use.
 
 
 `PKGBUILD`s are how packages are built on Arch. If you've used the [AUR][8]
@@ -113,12 +113,12 @@ asp export vim
 
 ## 4. Fixing Visual Bugs in Java Programs and Better Looking QT applications
 
-When using some Window Managers such a [bspwm][9] you sometimes run into
+When using some Window Managers such as [bspwm][9] you sometimes run into
 problems with Java based GUI applications like [jdownloader][10] or 
 [logisim][11]. The application starts up fine but none of the widgets are
 rendered. To fix this issue you need to add 
 `_JAVA_AWT_WM_NONREPARENTING=1` to the environment of the application. 
-This can either be done by using `env` on the command-line or
+This can either be done by using `env` on the command-line, or
 creating a custom `.desktop` file i.e 
 
 ```sh
@@ -168,10 +168,9 @@ the printed output.
 
 When you need to know the keycode or button number for a particular key
 on your keyboard or button on your mouse then you need `xev`. It's part
-of the `xorg-xev` package. When run it launches a window. Pressing a key
-or button with the window in focus prints out the key's/button's info.
-You can further limit the events to mouse or keyboard events using the
-`-event` flag e.g
+of the `xorg-xev` package. When run it launches a window and pressing a
+key or clicking a button with the window in focus prints out the 
+key's/button's info. You can further limit the events to mouse or keyboard events only using the `-event` flag e.g
 
 ```sh
 xev -event mouse
