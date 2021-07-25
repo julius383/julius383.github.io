@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>saveandrun: Colouring arbitrary shell output</title>
+        
+<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,cryptography,git,datalog,python">
+
+<meta name="description" content="I do a lot of my work on the command line and consequently are often staring
+at large amounts of text. This isn&#39;t much of a problem when working with code
+in any decent editor but firing one up isn&#39;t always necessary
+especially when you don&#39;t need to make any edits. For just inspecting the
+output of a command less is often enough but it lacks the syntax highlighting
+you get from an editor.A while ago I found the pygments project that provides a utility
+called pygmentize which allows you to highlight code by running a command and
+supports various forms of output like html and ANSI escape codes for the
+terminal. What this means is you could just run pygmentize -g code.py | less -R
+and have syntax highlighting outside an editor. Another tool bat
+works in a similar way but knows to use $PAGER so I don&#39;t have to manually
+pipe output into less when dealing with text that won&#39;t fit on screen.">
+<meta property="og:description" content="I do a lot of my work on the command line and consequently are often staring
+at large amounts of text. This isn&#39;t much of a problem when working with code
+in any decent editor but firing one up isn&#39;t always necessary
+especially when you don&#39;t need to make any edits. For just inspecting the
+output of a command less is often enough but it lacks the syntax highlighting
+you get from an editor.A while ago I found the pygments project that provides a utility
+called pygmentize which allows you to highlight code by running a command and
+supports various forms of output like html and ANSI escape codes for the
+terminal. What this means is you could just run pygmentize -g code.py | less -R
+and have syntax highlighting outside an editor. Another tool bat
+works in a similar way but knows to use $PAGER so I don&#39;t have to manually
+pipe output into less when dealing with text that won&#39;t fit on screen.">
+
+<meta property="og:url" content="https://julius383.github.io/posts-output/2019-03-24-coloring-arbitrary-shell-output/" />
+<meta property="og:title" content="Colouring arbitrary shell output" />
+<meta property="og:type" content="article" />
+
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link
+            href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700|Inconsolata:700|Alegreya:500,700|Alegreya+Sans:400|Roboto:400,700"
+            type="text/css"
+            rel="stylesheet"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-32x32.png"
+            sizes="32x32"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-16x16.png"
+            sizes="16x16"
+            />
+        <link href="/css/main.css" rel="stylesheet" type="text/css" />
+        <link href="/css/prism.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+
+        <div class="container">
+            <nav class="nav">
+                <div class="nav-left" id="site-title">
+                    <a href="/">saveandrun</a>
+                </div>
+                <div class="nav-right">
+                    <a title="archives" href="/archives/">archives</a>
+                    <a title="tags" href="/tags/">tags</a>
+                    <a title="rss" href="/feed.xml">rss</a>
+                    <button id="themeToggle" class="button icon-only" onclick="toggleTheme()"></button>
+                </div>
+            </nav>
+            <hr>
+            
+<div id="post">
+    <div class="post-header">
+    <h1 class="text-center text-capitalize page-title">Colouring arbitrary shell output</h1>
+    <div id="post-meta" class="text-center">
+        Mar 24, 2019
+    </div>
+
+    
+    <div class="text-center">
+        
+            
+                <b>[</b>
+            
+            <a href="/tags-output/linux/">linux</a>
+            
+                ,
+            
+        
+            
+            <a href="/tags-output/shell/">shell</a>
+            
+                ,
+            
+        
+            
+            <a href="/tags-output/python/">python</a>
+            
+                <b>]</b>
+                
+        
+    </div>
+    
+    <br/>
+</div>
+<div>
+    
+    <p>I do a lot of my work on the command line and consequently are often staring
+at large amounts of text. This isn't much of a problem when working with code
+in any decent <a href="https://neovim.io/">editor</a> but firing one up isn't always necessary
+especially when you don't need to make any edits. For just inspecting the
+output of a command <code>less</code> is often enough but it lacks the syntax highlighting
+you get from an editor.</p><p>A while ago I found the <a href="http://pygments.org/">pygments</a> project that provides a utility
+called <code>pygmentize</code> which allows you to highlight code by running a command and
+supports various forms of output like html and ANSI escape codes for the
+terminal. What this means is you could just run <code>pygmentize -g code.py | less -R</code>
+and have syntax highlighting outside an editor. Another tool <a href="https://github.com/sharkdp/bat">bat</a>
+works in a similar way but knows to use <code>$PAGER</code> so I don't have to manually
+pipe output into <code>less</code> when dealing with text that won't fit on screen.</p><p>The problem is <code>pygmentize</code> only works for things it already knows about.
+You (or someone else) has to have written a <a href="https://en.wikipedia.org/wiki/Lexical_analysis">lexer</a> for the language
+you want to highlight. The same is true for <code>bat</code>.</p><h2 id="highlighting-text-without-writing-a-custom-lexer">Highlighting Text Without Writing A Custom Lexer</h2><p>Pygments is a cool project and lexers already exists for pretty much every
+language you may need. I hardly ever need to highlight source files though
+since despite how I've made it seem, opening an editor is almost always
+the appropriate action. What I do need though is highlighting for any command
+that produces a large amount of text which in my case is typically the output
+of <code>cower -s</code>.</p><p><a href="https://github.com/mgalgs/cower">cower</a> is a tool that allows you to search for and download packages from
+the <a href="https://wiki.archlinux.org/index.php/Arch_User_Repository">Arch User Repository</a>. It doesn't have as many features as some of the
+other tools but works well and stays out of your way. Here's how the output
+typically looks:</p><p><img src="/assets/cower1.png" alt="cower uncolored output" /></p><p>As you can see it can be kind of hard to find exactly what you need in all the
+text produced so I started thinking of a way to use pygments without first
+having to define a custom lexer.</p><h3 id="the-script">The Script</h3><p>Pygments has a tutorial on their website describing <a href="http://pygments.org/docs/lexerdevelopment/">how to write a lexer</a>
+that was very useful in writing this script. I will omit most of the set-up
+code which you can see in the <a href="https://gist.github.com/julius383/00ef07454dd51c352eed6d3164f531d2">gist</a> with the full version of the script
+and only include the <code>main</code> function.</p><pre><code class="language-py">def main():
+    global groups
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--pattern', dest='patterns', nargs='+')
+    args = parser.parse_args()
+</code></pre><p>The first part of the main function indicates the usage of a global variable
+<code>groups</code> which is a list of the custom pygments tokens I created for use in
+this script. Next is instantiation of the <a href="https://docs.python.org/3.6/library/argparse.html">argument parser</a> which takes at
+least one regular expression to use for highlighting (<code>nargs='+'</code>) and puts
+them in a list.</p><pre><code class="language-py">    class CustomLexer(RegexLexer):
+        name = 'rcolor'
+        tokens = { 'root' : list(zip(args.patterns,
+				      itertools.cycle(groups))) }
+
+    text = sys.stdin.read()
+    result = pygments.highlight(text, CustomLexer(),
+            Terminal256Formatter(style=RegexStyle))
+    print(result)
+
+    return 0
+</code></pre><p>As per the instructions on how to create a lexer, we create a sub-class of
+<code>RegexLexer</code> with the regular expressions passed in by the user. This is done
+simply by setting the <code>root</code> value to a list of tuples of the form
+<code>(regex_string, token_group)</code>. In our case the regular expressions are
+specified by the user on the command line and are in a list <code>args.patterns</code>.</p><p><code>itertools.cycle</code> ensures that all the regular expression are assigned a
+group for colouring even if we need to reuse the groups.
+Finally since this script is meant to be used to colour output from any given
+command, we read input from <code>stdin</code>.</p><p>All that's left is to highlight the text with our custom lexer and ensure the
+output produced is tailored to the terminal. Here's what the end result looks
+like:</p><p><img src="/assets/cower2.png" alt="cower coloured output" /></p><p>Looks a lot nicer doesn't it?</p><h3 id="going-further">Going Further</h3><p>Before starting this article I did not know of the existence several programs
+that do essentially the same thing. A <a href="https://wiki.archlinux.org/index.php/Color_output_in_console#Wrappers">list</a> can be found on the Arch wiki.</p>
+</div>
+
+    <div id="prev-next">
+        
+        <a class="pull-left button clear" href="/posts-output/2019-05-07-writing-a-command-for-ranger/">&laquo; Writing a Command for Ranger</a>
+        
+        
+        <a class="pull-right button clear" href="/posts-output/2019-03-22-data-flow-on-the-shell/">Data flow on the shell &raquo;</a>
+        
+        <br>
+    </div>
+
+</div>
+
+            <hr/>
+        </div>
+        <script src="/js/prism.js" type="application/javascript"></script>
+        <script>
+            if (window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+                let element = document.getElementById('themeToggle');
+                element.classList.add("dark");
+            }
+            function toggleTheme() {
+                document.body.classList.toggle("dark");
+                let element = document.getElementById('themeToggle');
+                element.classList.toggle("dark");
+                element.classList.add("animate");
+                setTimeout(function(){
+                    element.classList.remove('animate');
+                }, 500);
+            }
+        </script>
+        
+        
+    </body>
+</html>

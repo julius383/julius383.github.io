@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>saveandrun: Data flow on the shell</title>
+        
+<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,cryptography,git,datalog,python">
+
+<meta name="description" content="PipesIf you&#39;ve ever spent more than two seconds on anything resembling a Unix shell -
+bash and friends - you&#39;ve probably used a pipe. Basically a shell pipe,
+represented by the bar character (|) on a keyboard, is a way of connecting the
+output of one command to the input of another. Here&#39;s one example taken from my
+shell history that changes all the .txt (text) files in the current and sub
+directories to .md (markdown) files:">
+<meta property="og:description" content="PipesIf you&#39;ve ever spent more than two seconds on anything resembling a Unix shell -
+bash and friends - you&#39;ve probably used a pipe. Basically a shell pipe,
+represented by the bar character (|) on a keyboard, is a way of connecting the
+output of one command to the input of another. Here&#39;s one example taken from my
+shell history that changes all the .txt (text) files in the current and sub
+directories to .md (markdown) files:">
+
+<meta property="og:url" content="https://julius383.github.io/posts-output/2019-03-22-data-flow-on-the-shell/" />
+<meta property="og:title" content="Data flow on the shell" />
+<meta property="og:type" content="article" />
+
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link
+            href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700|Inconsolata:700|Alegreya:500,700|Alegreya+Sans:400|Roboto:400,700"
+            type="text/css"
+            rel="stylesheet"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-32x32.png"
+            sizes="32x32"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-16x16.png"
+            sizes="16x16"
+            />
+        <link href="/css/main.css" rel="stylesheet" type="text/css" />
+        <link href="/css/prism.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+
+        <div class="container">
+            <nav class="nav">
+                <div class="nav-left" id="site-title">
+                    <a href="/">saveandrun</a>
+                </div>
+                <div class="nav-right">
+                    <a title="archives" href="/archives/">archives</a>
+                    <a title="tags" href="/tags/">tags</a>
+                    <a title="rss" href="/feed.xml">rss</a>
+                    <button id="themeToggle" class="button icon-only" onclick="toggleTheme()"></button>
+                </div>
+            </nav>
+            <hr>
+            
+<div id="post">
+    <div class="post-header">
+    <h1 class="text-center text-capitalize page-title">Data flow on the shell</h1>
+    <div id="post-meta" class="text-center">
+        Mar 22, 2019
+    </div>
+
+    
+    <div class="text-center">
+        
+            
+                <b>[</b>
+            
+            <a href="/tags-output/bash/">bash</a>
+            
+                ,
+            
+        
+            
+            <a href="/tags-output/linux/">linux</a>
+            
+                ,
+            
+        
+            
+            <a href="/tags-output/shell/">shell</a>
+            
+                <b>]</b>
+                
+        
+    </div>
+    
+    <br/>
+</div>
+<div>
+    
+    <h2 id="pipes">Pipes</h2><p>If you've ever spent more than two seconds on anything resembling a Unix shell -
+bash and friends - you've probably used a <a href="https://en.wikipedia.org/wiki/Pipeline_%28Unix%29">pipe</a>. Basically a shell pipe,
+represented by the bar character (<code>|</code>) on a keyboard, is a way of connecting the
+output of one command to the input of another. Here's one example taken from my
+shell history that changes all the <code>.txt</code> (text) files in the current and sub
+directories to <code>.md</code> (markdown) files:</p><pre><code class="language-sh">find . -type f -name '*.txt' | rename .txt .md
+</code></pre><h2 id="redirection">Redirection</h2><p>Taking the idea of controlling the input/output of a program further is
+redirection. It uses the less-than and greater-than symbols (<code>&lt;</code> and <code>&gt;</code>)
+which control where input comes from and where output goes to respectively.
+Compared to the relative simplicity of the pipe operator, redirection is
+somewhat <a href="https://www.tldp.org/LDP/abs/html/io-redirection.html">overloaded</a>.
+For example <code>cat file1.txt file2.txt &gt;&gt; file3.txt</code> would append the contents of
+<code>file1.txt</code> and <code>file2.txt</code> to <code>file3.txt</code> while <code>cat file1.txt file2.txt &gt; file3.txt</code> would overwrite what was in <code>file3.txt</code> prior to running this command.</p><p>What's particularly useful for our purposes is the ability to use it with code
+blocks. More specifically  <code>while</code>, <code>for</code> and, <code>if/then</code> blocks. The example
+below prints out the character count and upper-cased version of each line of a
+file. It's not a very practical example but bear with me a little.</p><pre><code class="language-sh">while read -r line
+do
+  echo -n "${#line}: " # expands to length of the variable line
+  echo "$line" | tr 'a-z' 'A-Z'
+done &lt; data.txt
+</code></pre><h2 id="process-substitution">Process Substitution</h2><p>One drawback of pipelines is they only work when programs use the <a href="https://en.wikipedia.org/wiki/Standard_streams">standard
+streams</a> for input and output and not when they only accept files. Process substitution lifts this restriction by creating files in <code>/dev/fd/</code>
+to pass around the output of a process/program. The syntax is <code>&lt;(command)</code>,
+note the lack of space between the <code>&lt;</code> and <code>(</code>, this is significant.</p><p>Why is this useful? Before we get to that let's recap what we've seen so far:</p><ul><li>Output from a process can be captured and sent somewhere else</li><li>That <em>somewhere else</em> can be a code block like a <code>while</code> loop</li><li>Code in the loop proceeds with processing as normal</li></ul><p>Combine all these and you get a concise solution to an otherwise tricky
+problem.</p><h3 id="the-problem">The Problem</h3><p>I have a bunch of notes as plain markdown files that I keep synced between my
+computer and phone with <a href="https://syncthing.net/">syncthing</a>. Overtime the
+files have accumulated and become disorganized. I recently decided to try and
+fix this. Using <a href="https://ranger.github.io/">ranger</a>, I am able to  group the
+files into directories with related content. However, there's still a bunch of
+files that although have descriptive filenames, would be better organized in a
+single file under different headings.</p><h3 id="the-solution">The Solution</h3><p>I tried a couple of different approaches all of which were either too clunky
+or didn't do <em>exactly</em> what I wanted. Eventually I was able to figure out the
+following:</p><pre><code class="language-sh">cd ~/notes/some/dir
+while read -r name
+do
+  echo "## $(basename $name)" &gt;&gt; grouped.md
+  cat "$name" &gt;&gt; grouped.md
+  echo -e "\n\n" &gt;&gt; grouped.md
+done &lt; &lt;(find . -maxdepth 1 -type f)
+</code></pre><p>Let's walk-through what's happening:</p><ul><li>Change into the directory containing the files</li><li>Run <code>find</code> which gathers the names of all the regular files in the
+current directory only (<code>-maxdepth 1</code>).</li><li>Pass the names into the <code>while</code> loop using process substitution and
+redirection as we have seen is possible.</li><li>Read each filename into a variable <code>name</code> available in the <code>while</code>
+loop's body.</li><li>Write a level 2 markdown header into the output file (using <code>&gt;&gt;</code> for
+appending).</li><li>Write the contents of the file <code>name</code> to the output file (again appending
+is necessary).</li><li>Add newlines to delimit the different items.</li></ul><p>The end result is a single file with content under relevant headings all
+without tedious copy-pasting or complicated code :). How would you have done it?</p><h2 id="appendix">Appendix</h2><ul><li>Chapter 6 of <a href="http://www.linuxcommand.org/tlcl.php/">The Linux Command Line</a> although the entire book is great.</li><li><a href="https://www.tldp.org/LDP/abs/html/redircb.html">Redirecting Code Blocks</a> on the Linux Documentation Project.</li><li><a href="https://www.tldp.org/LDP/abs/html/process-sub.html">Process Substitution</a> also on TLDP. There are some great examples of when process substitution may be useful.</li></ul>
+</div>
+
+    <div id="prev-next">
+        
+        <a class="pull-left button clear" href="/posts-output/2019-03-24-coloring-arbitrary-shell-output/">&laquo; Colouring arbitrary shell output</a>
+        
+        
+        <br>
+    </div>
+
+</div>
+
+            <hr/>
+        </div>
+        <script src="/js/prism.js" type="application/javascript"></script>
+        <script>
+            if (window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+                let element = document.getElementById('themeToggle');
+                element.classList.add("dark");
+            }
+            function toggleTheme() {
+                document.body.classList.toggle("dark");
+                let element = document.getElementById('themeToggle');
+                element.classList.toggle("dark");
+                element.classList.add("animate");
+                setTimeout(function(){
+                    element.classList.remove('animate');
+                }, 500);
+            }
+        </script>
+        
+        
+    </body>
+</html>

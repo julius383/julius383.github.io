@@ -1,11 +1,10 @@
 @import url(chota.css);
-
 :root {
   --color-error: #CD113B;
   --grid-maxwidth: 90rem;
   --font-size: 2.2rem;
-  --font-family-sans: 'Alegreya Sans', Roboto, sans-serif;
-  --font-family-mono: 'Fira Mono', Inconsolata, monospace;
+  --font-family-sans: "Alegreya Sans", Roboto, sans-serif;
+  --font-family-mono: "Fira Mono", Inconsolata, monospace;
 }
 
 .dark {
@@ -38,15 +37,13 @@ button.clear {
 }
 
 @keyframes spin {
-    from {
-        transform:rotate(0deg);
-    }
-    to {
-        transform:rotate(360deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
-
-
 img {
   display: block;
   margin-left: auto;
@@ -55,7 +52,6 @@ img {
   height: auto;
   max-width: 100%;
 }
-
 
 #prev-next a {
   color: var(--color-darkGrey);
@@ -68,98 +64,90 @@ img {
 
 .title {
   font-family: var(--font-family-mono);
-  border:none;
+  border: none;
   text-decoration: none;
-  &:hover {
-    border: none;
-    color: var(--color-grey);
-  }
+}
+.title:hover {
+  border: none;
+  color: var(--color-grey);
 }
 
-#post .row{
+#post .row {
   margin: 1rem 0rem 1rem 0rem;
 }
 
 hr {
   margin: 5px;
-  border-top: 1px solid rgba(0,0,0,0.1);
-  border-bottom: 1px solid rgba(255,255,255,0.3);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .details {
   font-size: 1.8rem;
-  a {
-    text-decoration:none;
-    color: var(--font-color);
-    border-bottom: 0.125em var(--font-color) solid;
-
-    &:visited {
-      color: var(--font-color);
-      border-bottom: 0.125em var(--font-color) solid;
-    }
-  }
-  b {
-    padding: 0em 0.25em 0em 0.25em;
-  }
 }
-
+.details a {
+  text-decoration: none;
+  color: var(--font-color);
+  border-bottom: 0.125em var(--font-color) solid;
+}
+.details a:visited {
+  color: var(--font-color);
+  border-bottom: 0.125em var(--font-color) solid;
+}
+.details b {
+  padding: 0em 0.25em 0em 0.25em;
+}
 
 .nav a {
   padding: 0.5rem 1rem;
   border: none;
   color: var(--font-color);
-
-  &:hover {
-    border: none;
-    color: var(--color-grey);
-  }
-  &:visited {
-    border: none;
-    color: var(--font-color);
-  }
+}
+.nav a:hover {
+  border: none;
+  color: var(--color-grey);
+}
+.nav a:visited {
+  border: none;
+  color: var(--font-color);
 }
 
 .container {
   max-width: var(--grid-maxwidth);
 }
 
-.page-title{
-    text-align: center;
-    font-size: xx-large;
-    font-weight: bold;
-    line-height: 2;
+.page-title {
+  text-align: center;
+  font-size: xx-large;
+  font-weight: bold;
+  line-height: 2;
 }
 
 figcaption {
-  text-align:center;
+  text-align: center;
   font-style: italic;
 }
 
-
 a {
-  text-decoration:none;
+  text-decoration: none;
   color: var(--font-color);
   border-bottom: 0.125em var(--font-color) solid;
-
-  &:visited {
-    color: var(--font-color);
-    border-bottom: 0.125em #b53333 solid;
-  }
-
-
-  &:hover {
-    text-decoration:none;
-    color: var(--font-color);
-    border-bottom: 0.125em green solid;
-    cursor: pointer;
-  }
+}
+a:visited {
+  color: var(--font-color);
+  border-bottom: 0.125em #b53333 solid;
+}
+a:hover {
+  text-decoration: none;
+  color: var(--font-color);
+  border-bottom: 0.125em green solid;
+  cursor: pointer;
 }
 
-
 hr {
-    margin: 5px;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  margin: 5px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 pre, code {
@@ -172,6 +160,8 @@ pre {
   padding: 0.5em;
   margin: 1.2rem 0 1rem 0;
   border-radius: 5px;
-  border:1px solid #ccc;
+  border: 1px solid #ccc;
   white-space: pre-wrap;
 }
+
+/*# sourceMappingURL=main.css.map */

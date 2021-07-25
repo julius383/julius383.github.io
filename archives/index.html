@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>saveandrun: Archives</title>
+        
+        <meta name="description" content="A blog about programming">
+        <meta name="keywords" content="programming,python,linux,haskell">
+        
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link
+            href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700|Inconsolata:700|Alegreya:500,700|Alegreya+Sans:400|Roboto:400,700"
+            type="text/css"
+            rel="stylesheet"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-32x32.png"
+            sizes="32x32"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-16x16.png"
+            sizes="16x16"
+            />
+        <link href="/css/main.css" rel="stylesheet" type="text/css" />
+        <link href="/css/prism.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+
+        <div class="container">
+            <nav class="nav">
+                <div class="nav-left" id="site-title">
+                    <a href="/">saveandrun</a>
+                </div>
+                <div class="nav-right">
+                    <a title="archives" href="/archives/">archives</a>
+                    <a title="tags" href="/tags/">tags</a>
+                    <a title="rss" href="/feed.xml">rss</a>
+                    <button id="themeToggle" class="button icon-only" onclick="toggleTheme()"></button>
+                </div>
+            </nav>
+            <hr>
+            
+<div id="posts">
+    <div id="page-header">
+        <h1>Archives</h1>
+    </div>
+    
+        <h4>2020 September</h4>
+        <ul>
+        
+        <li>
+            Sep 30 - <a href="/posts-output/2020-09-30-tips-for-an-improved-arch-linux-experience/">Tips For An Improved Arch Linux Experience</a>
+        </li>
+        
+        </ul>
+    
+        <h4>2020 April</h4>
+        <ul>
+        
+        <li>
+            Apr 15 - <a href="/posts-output/2020-04-15-implementing-asemica-a-markov-chain-based-cipher/">Implementing Asemica: A Markov Chain Based Cipher</a>
+        </li>
+        
+        <li>
+            Apr 05 - <a href="/posts-output/2020-04-05-querying-pacman-with-datalog/">Querying Pacman with Datalog</a>
+        </li>
+        
+        </ul>
+    
+        <h4>2020 January</h4>
+        <ul>
+        
+        <li>
+            Jan 24 - <a href="/posts-output/2020-01-24-generating-mazes-with-haskell-part-1/">Generating Mazes with Haskell: Part 1</a>
+        </li>
+        
+        <li>
+            Jan 08 - <a href="/posts-output/2020-01-08-working-with-git/">Working With Git</a>
+        </li>
+        
+        </ul>
+    
+        <h4>2019 June</h4>
+        <ul>
+        
+        <li>
+            Jun 27 - <a href="/posts-output/2019-06-27-makefile-madness/">Makefile Madness</a>
+        </li>
+        
+        </ul>
+    
+        <h4>2019 May</h4>
+        <ul>
+        
+        <li>
+            May 07 - <a href="/posts-output/2019-05-07-writing-a-command-for-ranger/">Writing a Command for Ranger</a>
+        </li>
+        
+        </ul>
+    
+        <h4>2019 March</h4>
+        <ul>
+        
+        <li>
+            Mar 24 - <a href="/posts-output/2019-03-24-coloring-arbitrary-shell-output/">Colouring arbitrary shell output</a>
+        </li>
+        
+        <li>
+            Mar 22 - <a href="/posts-output/2019-03-22-data-flow-on-the-shell/">Data flow on the shell</a>
+        </li>
+        
+        </ul>
+    
+
+</div>
+
+            <hr/>
+        </div>
+        <script src="/js/prism.js" type="application/javascript"></script>
+        <script>
+            if (window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+                let element = document.getElementById('themeToggle');
+                element.classList.add("dark");
+            }
+            function toggleTheme() {
+                document.body.classList.toggle("dark");
+                let element = document.getElementById('themeToggle');
+                element.classList.toggle("dark");
+                element.classList.add("animate");
+                setTimeout(function(){
+                    element.classList.remove('animate');
+                }, 500);
+            }
+        </script>
+        
+        
+    </body>
+</html>

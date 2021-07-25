@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>saveandrun: Tips For An Improved Arch Linux Experience</title>
+        
+<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,cryptography,git,datalog,python">
+
+<meta name="description" content="1. Fallback Kernel and FirewallArch Linux follows a rolling release model meaning that a lot of the
+packages on the official repositories are fairly recent. This is great
+since you can get updates quickly but you may also end up with software
+with some yet to be discovered bugs. Since this can leave you with an
+unbootable system, it&#39;s a good idea to have a backup plan. For the case of the kernel it&#39;s as simple as installing a secondary kernel. The exact
+command is:">
+<meta property="og:description" content="1. Fallback Kernel and FirewallArch Linux follows a rolling release model meaning that a lot of the
+packages on the official repositories are fairly recent. This is great
+since you can get updates quickly but you may also end up with software
+with some yet to be discovered bugs. Since this can leave you with an
+unbootable system, it&#39;s a good idea to have a backup plan. For the case of the kernel it&#39;s as simple as installing a secondary kernel. The exact
+command is:">
+
+<meta property="og:url" content="https://julius383.github.io/posts-output/2020-09-30-tips-for-an-improved-arch-linux-experience/" />
+<meta property="og:title" content="Tips For An Improved Arch Linux Experience" />
+<meta property="og:type" content="article" />
+
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link
+            href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700|Inconsolata:700|Alegreya:500,700|Alegreya+Sans:400|Roboto:400,700"
+            type="text/css"
+            rel="stylesheet"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-32x32.png"
+            sizes="32x32"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-16x16.png"
+            sizes="16x16"
+            />
+        <link href="/css/main.css" rel="stylesheet" type="text/css" />
+        <link href="/css/prism.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+
+        <div class="container">
+            <nav class="nav">
+                <div class="nav-left" id="site-title">
+                    <a href="/">saveandrun</a>
+                </div>
+                <div class="nav-right">
+                    <a title="archives" href="/archives/">archives</a>
+                    <a title="tags" href="/tags/">tags</a>
+                    <a title="rss" href="/feed.xml">rss</a>
+                    <button id="themeToggle" class="button icon-only" onclick="toggleTheme()"></button>
+                </div>
+            </nav>
+            <hr>
+            
+<div id="post">
+    <div class="post-header">
+    <h1 class="text-center text-capitalize page-title">Tips For An Improved Arch Linux Experience</h1>
+    <div id="post-meta" class="text-center">
+        Sep 30, 2020
+    </div>
+
+    
+    <div class="text-center">
+        
+            
+                <b>[</b>
+            
+            <a href="/tags-output/linux/">linux</a>
+            
+                <b>]</b>
+                
+        
+    </div>
+    
+    <br/>
+</div>
+<div>
+    
+    <h2 id="1-fallback-kernel-and-firewall">1. Fallback Kernel and Firewall</h2><p>Arch Linux follows a rolling release model meaning that a lot of the
+packages on the official repositories are fairly recent. This is great
+since you can get updates quickly but you may also end up with software
+with some yet to be discovered bugs. Since this can leave you with an
+unbootable system, it's a good idea to have a backup plan. For the case of the kernel it's as simple as installing a secondary kernel. The exact
+command is:</p><pre><code class="language-sh">sudo pacman -Syu &lt;alternative-kernel&gt;
+</code></pre><p><code>&lt;alternative-kernel&gt;</code> may be any of the officially supported kernels but
+I would recommend <code>linux-lts</code> which is the longterm support version and
+is generally considered to be more stable. You can boot into an
+alternative kernel by choosing the relevant option in the <code>GRUB</code> menu
+when your computer is starting.</p><p>Although it is mentioned in the <a href="https://wiki.archlinux.org/index.php/General_recommendations">General Recommendations</a> of the Arch
+Wiki - which everyone should read at least once - not many people take the
+time to setup a firewall. The first few times I had to install Arch I did
+it by following the <a href="https://wiki.archlinux.org/index.php/Simple_stateful_firewall">Simple stateful firewall</a> guide on the wiki.
+Although this is simple enough, it's pretty painful manually specifying
+all the rules so instead it is preferable to use <a href="https://wiki.archlinux.org/index.php/Uncomplicated_Firewall"><code>ufw</code></a>. It simplifies
+the process of specifying rules and has the added benefit of already
+containing 'profiles' for common applications like <code>ssh</code> and <code>syncthing</code>.
+To see the available app profiles use <code>sudo ufw app list</code> then you can
+use <code>sudo ufw allow syncthing</code> to enable the rules for the corresponding
+app.</p><h2 id="2-ranking-mirrors-and-merging-changes-to-system-files">2. Ranking Mirrors and Merging Changes To System Files</h2><p>One of the tasks you have to do during installation is editing <code>/etc/pacman.d/mirrorlist</code> to enable a mirror where <code>pacman</code> looks for packages.
+Although it's generally true that the closer the mirror is to your
+physical location the faster it will be, this is not always the case.
+There's two approaches you can take to solving the problem, the first
+is using <code>rankmirrors</code> as described on the <a href="https://wiki.archlinux.org/index.php/Mirrors#List_by_speed">wiki</a> or using <code>reflector</code> along with a pacman hook that runs whenever the mirrorlist is updated.
+For the second approach create a file <code>mirrorupgrade.hook</code> in <code>/etc/pacman.d/hooks/</code></p><pre><code class="language-ini">[Trigger]
+Operation = Upgrade
+Type = Package
+Target = pacman-mirrorlist
+
+[Action]
+Description = Updating pacman-mirrorlist with reflector and removing pacnew...
+When = PostTransaction
+Depends = reflector
+Exec = /bin/sh -c "reflector --latest 200 --age 24 --score 10 --sort rate --save /etc/pacman.d/mirrorlist; rm -f /etc/pacman.d/mirrorlist.pacnew"
+</code></pre><p>With this anytime that <code>pacman-mirrorlist</code> is upgraded the <code>Exec</code> line is
+run which uses <code>reflector</code> to find the 10 fastest mirrors out of the
+most recent 200 mirrors within the last 24 hours.</p><p>When a package is updated and a file from the updated package is different
+from the one on disk, the file from the packages is renamed with the
+<code>.pacnew</code> extension. This is to ensure that your changes are not
+overwritten during a upgrade. A message is printed during install
+informing you of this and you should find time to merge the changes. To
+make this easier I recommend installing <a href="https://meldmerge.org/"><code>meld</code></a> and <code>pacdiff</code> which is
+part of <code>pacman-contrib</code> that also contains the previously mentioned
+<code>rankmirrors</code>. <code>meld</code> is a visual diff and merge tool that's pretty handy
+to use. To resolve <code>.pacnew</code> files run</p><pre><code class="language-sh">env DIFFPROG=meld sudo -E pacdiff
+</code></pre><p><code>DIFFPROG=meld</code> ensures that <code>meld</code> is used to perform the diffing. You
+can use something else by changing the value of the variable e.g
+<code>DIFFPROG=vimdiff</code>. The <code>-E</code> flag ensures that sudo retains the
+environment. You can then proceed to compare and merge the normal
+and <code>.pacnew</code> files.</p><h2 id="3-improving-makepkg-compile-times-and-downloading-pkgbuilds">3. Improving <code>makepkg</code> Compile Times and Downloading <code>PKGBUILD</code>s</h2><p>There are a couple of different ways to improve the performance of
+<code>makepkg</code> as outlined on the corresponding <a href="https://wiki.archlinux.org/index.php/Makepkg">wiki</a> page but the one I
+find easiest to set-up is adding <code>ccache</code>. <code>ccache</code> reduces the time
+spent on subsequent compiles after the first one. Installing is done with
+<code>sudo pacman -Syu ccache</code> and in order to enable it with <code>makepkg</code> you
+just need to add <code>ccache</code> to the <code>BUILDENV</code> array inside
+<code>/etc/makepkg.conf</code>. How much this helps depends a lot on what type of
+software you use but it's such a small addition that it's a shame not to
+use.</p><p><code>PKGBUILD</code>s are how packages are built on Arch. If you've used the <a href="https://aur.archlinux.org/">AUR</a>
+you have probably had to open and inspect one but what if you want to
+find the <code>PKGBUILD</code> for an official package? You could look for it
+through the online <a href="https://www.archlinux.org/packages/">site</a> as you would with the AUR but that gets
+pretty tedious if you have to do it frequently. <code>asp</code> can be used instead
+to checkout the <code>PKGBUILD</code> used to build a package from the official
+Arch repo. For example to get the <code>PKGBUILD</code> for <code>vim</code> you'd use</p><pre><code class="language-sh">asp export vim
+</code></pre><h2 id="4-fixing-visual-bugs-in-java-programs-and-better-looking-qt-applications">4. Fixing Visual Bugs in Java Programs and Better Looking QT applications</h2><p>When using some Window Managers such as <a href="https://github.com/baskerville/bspwm">bspwm</a> you sometimes run into
+problems with Java based GUI applications like <a href="https://jdownloader.org/">jdownloader</a> or
+<a href="http://www.cburch.com/logisim/">logisim</a>. The application starts up fine but none of the widgets are
+rendered. To fix this issue you need to add
+<code>_JAVA_AWT_WM_NONREPARENTING=1</code> to the environment of the application.
+This can either be done by using <code>env</code> on the command-line, or
+creating a custom <code>.desktop</code> file i.e</p><pre><code class="language-sh"># set environment on the command-line
+env _JAVA_AWT_WM_NONREPARENTING=1 logisim
+
+# create a custom .desktop file
+
+# copy system-wide desktop file
+cp /usr/share/applications/logisim.desktop ~/.local/share/applications/
+
+# replace the Exec line
+
+# before
+...
+Exec=/usr/bin/logisim
+...
+
+# after
+...
+Exec=env _JAVA_AWT_WM_NONREPARENTING=1 /usr/bin/logisim
+...
+</code></pre><p>Alternatively modify the global environment by putting the
+variable assignment in <code>/etc/environment</code>.</p><p>When an application is built with QT it is possible to set the theme it
+uses similarly to how you can use a global GTK theme. To do this you
+need to install <a href="https://github.com/tsujan/Kvantum/tree/master/Kvantum"><code>kvantum</code></a> which is a theme engine for QT.
+To force a QT applications to use the theme specified in <code>kvantum</code> set
+<code>QT_STYLE_OVERRIDE=kvantum</code> in the environment using any of the methods
+described previously.</p><h2 id="5-finding-wm-namewm-class-and-keycodes">5. Finding <code>WM_NAME</code>/<code>WM_CLASS</code> and Keycodes</h2><p>It is sometimes necessary to know the <code>WM_NAME</code> or <code>WM_CLASS</code> for a
+particular application. Two examples of these cases is when defining
+windowing rules in <a href="https://github.com/baskerville/bspwm"><code>bspwm</code></a> or transparency rules in
+<a href="https://github.com/chjj/compton"><code>compton</code></a>. To find these values you need to have installed
+<code>xorg-xprop</code>. You can then run <code>xprop</code> in a terminal and click the window
+in question and the values for <code>WM_NAME</code> and <code>WM_CLASS</code> should be among
+the printed output.</p><p>When you need to know the keycode or button number for a particular key
+on your keyboard or button on your mouse then you need <code>xev</code>. It's part
+of the <code>xorg-xev</code> package. When run it launches a window and pressing a
+key or clicking a button with the window in focus prints out the
+key's/button's info. You can further limit the events to mouse or keyboard events only using the <code>-event</code> flag e.g</p><pre><code class="language-sh">xev -event mouse
+
+# left clicking in the opened window yields the output
+
+ButtonPress event, serial 25, synthetic NO, window 0x3400001,
+    root 0x1a1, subw 0x0, time 106783914, (434,395), root:(1402,436),
+    state 0x0, button 1, same_screen YES
+
+ButtonRelease event, serial 25, synthetic NO, window 0x3400001,
+    root 0x1a1, subw 0x0, time 106783939, (434,395), root:(1402,436),
+    state 0x100, button 1, same_screen YES
+</code></pre><p>As you can see the left-click mouse button is <code>button 1</code>.</p><p>At the end of the day Arch is meant to be tweaked to your heart's content
+so the more time you invest, the closer to your ideal system you get.
+Happy Hacking!</p>
+</div>
+
+    <div id="prev-next">
+        
+        
+        <a class="pull-right button clear" href="/posts-output/2020-04-15-implementing-asemica-a-markov-chain-based-cipher/">Implementing Asemica: A Markov Chain Based Cipher &raquo;</a>
+        
+        <br>
+    </div>
+
+</div>
+
+            <hr/>
+        </div>
+        <script src="/js/prism.js" type="application/javascript"></script>
+        <script>
+            if (window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+                let element = document.getElementById('themeToggle');
+                element.classList.add("dark");
+            }
+            function toggleTheme() {
+                document.body.classList.toggle("dark");
+                let element = document.getElementById('themeToggle');
+                element.classList.toggle("dark");
+                element.classList.add("animate");
+                setTimeout(function(){
+                    element.classList.remove('animate');
+                }, 500);
+            }
+        </script>
+        
+        
+    </body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>saveandrun: Querying Pacman with Datalog</title>
+        
+<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,cryptography,git,datalog,python">
+
+<meta name="description" content="Datalog is a declarative logic programming language that&#39;s normally
+used in deductive databases. A deductive database works by using known
+facts and a set of rules to determine (deduce) new facts. This is useful
+for a couple of reasons the main one being that you are able to express
+relationships that are really cumbersome (or downright impossible) in
+relational databases.Datalog Syntax &amp; Semantics">
+<meta property="og:description" content="Datalog is a declarative logic programming language that&#39;s normally
+used in deductive databases. A deductive database works by using known
+facts and a set of rules to determine (deduce) new facts. This is useful
+for a couple of reasons the main one being that you are able to express
+relationships that are really cumbersome (or downright impossible) in
+relational databases.Datalog Syntax &amp; Semantics">
+
+<meta property="og:url" content="https://julius383.github.io/posts-output/2020-04-05-querying-pacman-with-datalog/" />
+<meta property="og:title" content="Querying Pacman with Datalog" />
+<meta property="og:type" content="article" />
+
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link
+            href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700|Inconsolata:700|Alegreya:500,700|Alegreya+Sans:400|Roboto:400,700"
+            type="text/css"
+            rel="stylesheet"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-32x32.png"
+            sizes="32x32"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-16x16.png"
+            sizes="16x16"
+            />
+        <link href="/css/main.css" rel="stylesheet" type="text/css" />
+        <link href="/css/prism.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+
+        <div class="container">
+            <nav class="nav">
+                <div class="nav-left" id="site-title">
+                    <a href="/">saveandrun</a>
+                </div>
+                <div class="nav-right">
+                    <a title="archives" href="/archives/">archives</a>
+                    <a title="tags" href="/tags/">tags</a>
+                    <a title="rss" href="/feed.xml">rss</a>
+                    <button id="themeToggle" class="button icon-only" onclick="toggleTheme()"></button>
+                </div>
+            </nav>
+            <hr>
+            
+<div id="post">
+    <div class="post-header">
+    <h1 class="text-center text-capitalize page-title">Querying Pacman with Datalog</h1>
+    <div id="post-meta" class="text-center">
+        Apr 5, 2020
+    </div>
+
+    
+    <div class="text-center">
+        
+            
+                <b>[</b>
+            
+            <a href="/tags-output/linux/">linux</a>
+            
+                ,
+            
+        
+            
+            <a href="/tags-output/datalog/">datalog</a>
+            
+                ,
+            
+        
+            
+            <a href="/tags-output/python/">python</a>
+            
+                <b>]</b>
+                
+        
+    </div>
+    
+    <br/>
+</div>
+<div>
+    
+    <p><a href="https://en.wikipedia.org/wiki/Datalog">Datalog</a> is a declarative logic programming language that's normally
+used in deductive databases. A deductive database works by using known
+facts and a set of rules to determine (deduce) new facts. This is useful
+for a couple of reasons the main one being that you are able to express
+relationships that are really cumbersome (or downright impossible) in
+relational databases.</p><h2 id="datalog-syntax--semantics">Datalog Syntax &amp; Semantics</h2><p>Being a declarative language the syntax itself is very simple. The short
+version is that statements are divided into adding facts, adding rules and
+querying the database (which is when the deduction is done). One other
+action that can be performed is retraction which removes a fact from the
+database although it is less common in practice. There is no single
+canonical implementation for Datalog so syntax varies to some degree.</p><pre><code class="language-prolog">parent(mary, jane).
+parent(bob, john).
+ancestor(X, Y) :- parent(X, Y).
+ancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).
+parent(A, B)?
+parent(bob, john)~
+</code></pre><ul><li>The first 2 statements above add 2 new facts to the database i.e <code>mary</code>
+is the parent of <code>jane</code> and <code>bob</code> is the parent of <code>john</code><sup id="fnref-1"><a class="footnote-ref" href="#fn-1">1</a></sup>.</li><li>The next 2 statements are a rule describing how to tell if one person
+is another's ancestor, specifying that they are an ancestor if they
+are someone's parent or a parent of that person's ancestor.</li><li>The next rule is a query which has two variables <code>A</code> and <code>B</code>, anytime
+there is a variable<sup id="fnref-2"><a class="footnote-ref" href="#fn-2">2</a></sup> in a query the Datalog engine tries to find an
+assignment to that variable that is either a known fact or a derivable
+fact. So <code>parent(A, B)?</code> finds all the parent-child pairs in the
+database.</li><li>The last statement is a retraction and just removes the corresponding
+fact from the database.</li></ul><p>This is roughly all you need to know to understand the rest of this
+article. I have glossed over a lot of details so give the
+[appendix][appendix] a look if you want to know more.</p><h2 id="pydatalog">pyDatalog</h2><p>The WikiPedia page for Datalog lists a number of implementations and for
+the Python programming language, the one listed is <a href="https://sites.google.com/site/pydatalog/">pyDatalog</a>. It
+implements the core Datalog functionality as well as some extensions that
+make it useful in a wider range of problems. The Datalog syntax is embedded
+in Python so the previous statements become:</p><pre><code class="language-py">+ parent("mary", "jane")
++ parent("bob", "john")
+ancestor(X, Y) &lt;= parent(X, Y)
+ancestor(X, Y) &lt;= parent(X, Z) &amp; ancestor(Z, Y)
+parent(A, B)
+- parent("bob", "john")
+</code></pre><p>The exact way to use the library is described in the documentation with
+some additional information shown in code inside the <code>examples</code> directory
+of the pyDatalog repository.</p><h2 id="using-datalog-as-a-knowledge-base">Using Datalog as a Knowledge Base</h2><p>The deductive capabilities of a Datalog system make it a good candidate
+for a knowledge base because on top of being able to store things you
+know, you can store how to find out things you don't. For my particular
+case I decided to store package information from <a href="https://wiki.archlinux.org/index.php/Pacman">pacman</a> the Arch Linux
+package manager. Querying <code>pacman</code> for a package's information you get the
+following output:</p><pre><code>Name            : clang
+Version         : 9.0.1-1
+Description     : C language family frontend for LLVM
+Architecture    : x86_64
+URL             : https://clang.llvm.org/
+Licenses        : custom:Apache 2.0 with LLVM Exception
+Groups          : None
+Provides        : clang-analyzer=9.0.1  clang-tools-extra=9.0.1
+Depends On      : llvm-libs  gcc  compiler-rt
+Optional Deps   : openmp: OpenMP support in clang with -fopenmp
+                  python: for scan-view and git-clang-format [installed]
+                  llvm: referenced by some clang headers [installed]
+Required By     : opencl-mesa
+Optional For    : None
+Conflicts With  : clang-analyzer  clang-tools-extra
+Replaces        : clang-analyzer  clang-tools-extra
+Installed Size  : 98.28 MiB
+Packager        : Evangelos Foutras &lt;evangelos@foutrelis.com&gt;
+Build Date      : Mon 30 Dec 2019 01:58:04 EAT
+Install Date    : Thu 02 Jan 2020 21:06:06 EAT
+Install Reason  : Explicitly installed
+Install Script  : No
+Validated By    : Signature
+</code></pre><p>As you can see there is a bunch of useful information. Finding the
+information associated with a single package is easy enough but
+plain text was long ago proven to be a poor database. A relational
+database could work but fields like <code>Depends On</code> and <code>Required By</code>
+necessitate multiple tables for the sake of normalization which
+already makes things annoying.</p><p>Here's where Datalog comes in, each item a package <code>Depends On</code>
+can be stored as a single fact and be accessed just as easily. Practically
+though there are a few hoops to jump through before getting to the
+Datalog bit the first being extracting the package information. At first
+I was simply parsing the output of <code>pacman -Qi &lt;pkgname&gt;</code> like what is
+above but it's not really machine friendly. Luckily there's another tool
+<a href="https://github.com/falconindy/expac">expac</a> which provides <code>printf</code> like functionality with package
+information. The extraction function ends up becoming rather simple:</p><pre><code class="language-py">def get_package_info(pkgname):
+    info = {}
+    expac_fmt = ["%n", "%L", "%S", "%E", "%o", "%N"]
+    prog = ["expac", "-Q", "\\n".join(expac_fmt), pkgname]
+    keep = (
+        "Name",
+        "Licenses",
+        "Provides",
+        "Depends On",
+        "Optional Deps",
+        "Required By",
+    )
+    with subprocess.Popen(prog, stdout=subprocess.PIPE, text=True) as proc:
+        for i, line in enumerate(proc.stdout):
+            if i == 0: # Name field
+                info[keep[i]] = line.rstrip()
+            elif line == "\n": # This field is empty
+                info[keep[i]] = []
+            else:
+                info[keep[i]] = re.split(r"\s{2,}", line.rstrip())
+    return info
+</code></pre><p>Once the information about a package is collected into a dictionary, the
+next step is putting it in a Datalog database.</p><pre><code class="language-py">@pyDatalog.program()
+def _():
+    for pkg in all_packages(): # list of all installed packages
+        pkg_info = get_package_info(pkg)
+        name = pkg_info.pop("Name")
+        +is_pkg(name)
+        for i in pkg_info.pop("Licenses"):
+            +has_license(name, i)
+        for i in pkg_info.pop("Depends On"):
+            +depends_on(name, i)
+        for i in pkg_info.pop("Required By"):
+            +required_by(name, i)
+        for i in pkg_info.pop("Provides"):
+            +provides(name, i)
+        for i in pkg_info.pop("Optional Deps"):
+            +odepends(name, i)
+    optional_for(X, Y) &lt;= odepends(Y, X)
+    diff_license(X, Y, A, B) &lt;= depends_on(X, Y) &amp; has_license(X, A)\
+        &amp; has_license(Y, B) &amp; (A != B)
+    diffs = diff_license(A, B, C, D).data
+    create_correlation_plot(diffs)
+</code></pre><p>There's a couple of things worth mentioning about the above snippet.
+Firstly, you normally have to first declare the identifiers you will use
+in your pyDatalog statements with a line like <code>pyDatalog.create_terms(...)</code>
+but the <code>pyDatalog.program()</code> decorator allows you to skip this step. It
+runs the function it decorates making sure to call <code>create_terms</code> on any
+unbound identifiers in the body. You have to be really careful with this
+as you can end up with some subtle bugs in the form of unintentionally
+creating terms you don't need. The decorator also functions like a <code>main</code>
+function for you program.</p><p>You can probably guess what most of the function body does from our
+discussion so far. <code>is_pkg</code> acts as a way to register the packages we
+have and allows you to easily check if a certain package's information is
+present. The subsequent set of <code>for</code> loops add some facts like the names of
+a package's dependencies. Using our <code>clang</code> package as an example, that
+means that a fact like <code>depends_on("clang", "llvm-libs")</code> is added.</p><p>After the facts is our first rule <code>optional_for(X, Y)</code> which adds a rule
+that enables you to find the set of packages that is optional for some
+particular package. As you can see this information is already in the
+database albeit in a different form as the <code>odepends</code> (<code>Optional Deps</code>)
+fact. With Datalog we can see that it is easy to add rules that align the
+data more closely to our mental model.</p><p>The second rule is a lot more interesting. <code>diff_license(X, Y, A, B)</code>
+taken piecewise consists of:</p><ul><li><code>depends_on(X, Y)</code> finds a package <code>X</code> that depends on package <code>Y</code></li><li><code>has_license(X, A)</code> finds the license <code>A</code> for package <code>X</code></li><li><code>has_license(Y, B)</code> finds the license <code>B</code> for package <code>Y</code></li><li><code>(A != B)</code> ensures that license <code>A</code> and <code>B</code> are not the same</li></ul><p>With this rule added, a query <code>diff_license(A, B, C, D)</code> finds all
+the packages where its license and that of a dependency differs. For
+example one of the values returned would be <code>('clang', 'gcc', 'custom:Apache 2.0 with LLVM Exception', 'GPL')</code>. Pretty cool! The equivalent SQL
+is not nearly as simple probably requiring at least a <code>JOIN</code>.</p><h2 id="visualizing-the-relationship">Visualizing the Relationship</h2><p>A bunch of <code>(package, package, license, licence)</code> tuples are good to have
+but what we really want to know is how likely a package with a given
+license has a dependency with some other particular license. More
+concretely, how likely is it that a GPL licensed package has a MIT
+licensed dependency. I'll skip the code and go straight to the result this
+time<sup id="fnref-3"><a class="footnote-ref" href="#fn-3">3</a></sup>.</p><p><img src="/assets/corr.png" alt="License correlation matrix" /></p><p>There's a lot more you can do with this sort of Datalog backed package
+database that I'm in the process of working out. I promise to update
+this article with any other interesting results I obtain.</p><h2 id="appendix">Appendix</h2><ul><li>The <a href="https://pkgs.racket-lang.org/package/datalog">Racket</a> Datalog implementation comes with a simple <a href="https://docs.racket-lang.org/datalog/Tutorial.html">tutorial</a></li><li>The <a href="https://www.ccs.neu.edu/home/ramsdell/tools/datalog/datalog.html">Lua</a> Datalog implementation is also decent.</li><li><a href="http://logic.stanford.edu/jarvis/complaw/ddb.html">This</a> article gives a nice introduction to deductive databases.</li><li>A detailed source of information on Datalog can be found in <a href="https://ieeexplore.ieee.org/document/43410">this</a>
+(old) paper.</li><li><a href="https://dl.acm.org/doi/abs/10.1145/2951913.2951948">Datafun</a> offers a functional version of Datalog.</li><li>The book <a href="https://cseweb.ucsd.edu/~vianu/book.html">Foundations of Databases</a> contains a chapter about Datalog.</li><li>The full code can be found <a href="https://gist.github.com/julius383/a12ae043cb063c9e6780ff38791913c8">here</a></li></ul><div class="footnotes"><hr /><ol><li id="fn-1"><p>Uppercase letters represent variables which you are trying to
+find the value of. Lowercased identifiers occurring inside
+brackets represent literal values similar to symbols in Scheme.</p><a href="#fnref-1" class="footnote-backref">↩</a></li><li id="fn-2"><p>A variable does not need to be unique across statements and represent
+totally different things depending on where they occur.</p><a href="#fnref-2" class="footnote-backref">↩</a></li><li id="fn-3"><p>The visualization code can be seen in the full code listing</p><a href="#fnref-3" class="footnote-backref">↩</a></li></ol></div>
+</div>
+
+    <div id="prev-next">
+        
+        <a class="pull-left button clear" href="/posts-output/2020-04-15-implementing-asemica-a-markov-chain-based-cipher/">&laquo; Implementing Asemica: A Markov Chain Based Cipher</a>
+        
+        
+        <a class="pull-right button clear" href="/posts-output/2020-01-24-generating-mazes-with-haskell-part-1/">Generating Mazes with Haskell: Part 1 &raquo;</a>
+        
+        <br>
+    </div>
+
+</div>
+
+            <hr/>
+        </div>
+        <script src="/js/prism.js" type="application/javascript"></script>
+        <script>
+            if (window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+                let element = document.getElementById('themeToggle');
+                element.classList.add("dark");
+            }
+            function toggleTheme() {
+                document.body.classList.toggle("dark");
+                let element = document.getElementById('themeToggle');
+                element.classList.toggle("dark");
+                element.classList.add("animate");
+                setTimeout(function(){
+                    element.classList.remove('animate');
+                }, 500);
+            }
+        </script>
+        
+        
+    </body>
+</html>

@@ -1,17 +1,76 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-09-27T11:39:49+03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Your awesome title</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><entry><title type="html">Welcome to Jekyll!</title><link href="http://localhost:4000/jekyll/update/2020/09/27/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2020-09-27T11:25:14+03:00</published><updated>2020-09-27T11:25:14+03:00</updated><id>http://localhost:4000/jekyll/update/2020/09/27/welcome-to-jekyll</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2020/09/27/welcome-to-jekyll.html">&lt;p&gt;You’ll find this post in your &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
-
-&lt;p&gt;Jekyll requires blog post files to be named according to the following format:&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;YEAR-MONTH-DAY-title.MARKUP&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Where &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;YEAR&lt;/code&gt; is a four-digit number, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MONTH&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DAY&lt;/code&gt; are both two-digit numbers, and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MARKUP&lt;/code&gt; is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
-
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Tom'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints 'Hi, Tom' to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Check out the &lt;a href=&quot;https://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.</summary></entry></feed>
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><atom:link href="https://julius383.github.io/" rel="self" type="application/rss+xml"/><title>saveandrun</title><link>https://julius383.github.io/</link><description>A blog about programming</description><lastBuildDate>Sun, 25 Jul 2021 11:30:57 +0300</lastBuildDate><generator>clj-rss</generator><item><guid>https://julius383.github.io/posts-output/2020-09-30-tips-for-an-improved-arch-linux-experience/</guid><link>https://julius383.github.io/posts-output/2020-09-30-tips-for-an-improved-arch-linux-experience/</link><title>Tips For An Improved Arch Linux Experience</title><description>1. Fallback Kernel and FirewallArch Linux follows a rolling release model meaning that a lot of the
+packages on the official repositories are fairly recent. This is great
+since you can get updates quickly but you may also end up with software
+with some yet to be discovered bugs. Since this can leave you with an
+unbootable system, it's a good idea to have a backup plan. For the case of the kernel it's as simple as installing a secondary kernel. The exact
+command is:</description><pubDate>Wed, 30 Sep 2020 00:00:00 +0300</pubDate></item><item><guid>https://julius383.github.io/posts-output/2020-04-15-implementing-asemica-a-markov-chain-based-cipher/</guid><link>https://julius383.github.io/posts-output/2020-04-15-implementing-asemica-a-markov-chain-based-cipher/</link><title>Implementing Asemica: A Markov Chain Based Cipher</title><description>What exactly is a cipher? To put it simply it is an algorithm for
+performing encryption and decryption. Encryption being the process a piece
+of information (known as plaintext) is transformed into an alternate
+form (known as ciphertext) in such a way that knowing only the content
+of the ciphertext can not lead to knowing the content of the plaintext.
+Decryption is going the other way from ciphertext to plaintext.
+Both encryption and decryption rely on a key that drives the operation
+of the cipher. When the key changes ideally the same piece of plaintext
+should produce a different piece of ciphertext but the result of applying
+the right key to the right ciphertext should always lead to the same
+plaintext. A key then is the one piece of information (other than the
+plaintext obviously) that must remain secret. There are a lot of finer
+points but that is the gist of it.One other thing necessary to know before going into the discussion of
+the Asemica cipher is what a Markov chain is. The precise definition
+can be found on WikiPedia. For our purposes all you need to know is
+that it is a model where the probability of one event occurring depends
+only on the value (state) of the preceding event. That still sounds a bit
+cryptic but it'll become clearer later on.</description><pubDate>Wed, 15 Apr 2020 00:00:00 +0300</pubDate></item><item><guid>https://julius383.github.io/posts-output/2020-04-05-querying-pacman-with-datalog/</guid><link>https://julius383.github.io/posts-output/2020-04-05-querying-pacman-with-datalog/</link><title>Querying Pacman with Datalog</title><description>Datalog is a declarative logic programming language that's normally
+used in deductive databases. A deductive database works by using known
+facts and a set of rules to determine (deduce) new facts. This is useful
+for a couple of reasons the main one being that you are able to express
+relationships that are really cumbersome (or downright impossible) in
+relational databases.Datalog Syntax &amp; Semantics</description><pubDate>Sun, 05 Apr 2020 00:00:00 +0300</pubDate></item><item><guid>https://julius383.github.io/posts-output/2020-01-24-generating-mazes-with-haskell-part-1/</guid><link>https://julius383.github.io/posts-output/2020-01-24-generating-mazes-with-haskell-part-1/</link><title>Generating Mazes with Haskell: Part 1</title><description>One of the first big projects I worked on was generating mazes. After
+somehow coming across the book Mazes for Programmers (which to this
+day is still probably my favorite programming book) I implemented most of
+what was described and the results were cool as hell. Fast forward a bit
+and I once again stumbled upon something cool. This time it was
+Haskell, a lazy functional programming language. After reading about
+it for a while and seeing it being pretty consistently used in Computer
+Science research, I decided to try and learn it. Now anyone who's done
+more than a little programming will tell you that working on a project is
+the best way to learn a new language. After a bunch of thinking I
+remembered my old maze project and my vague plan to eventually go through
+the book again. With that and some friendly competition from my friend
+Kenneth who was doing the same thing in Rust, it was time to get
+started.Representing Mazes</description><pubDate>Fri, 24 Jan 2020 00:00:00 +0300</pubDate></item><item><guid>https://julius383.github.io/posts-output/2020-01-08-working-with-git/</guid><link>https://julius383.github.io/posts-output/2020-01-08-working-with-git/</link><title>Working With Git</title><description>git is an extremely useful tool that should be part of any serious
+developer's toolkit. If this is the first time hearing about it, the
+short version is that it allows you to track different versions of your
+files. This allows you to make significant changes without worrying
+about losing important work and, for multiple people to contribute to a
+project with the least amount of friction. With that said, this is by
+by no means an introduction to git but an exposition of some features
+that may help improve your productivity once you learn it.Empty Commit Messages</description><pubDate>Wed, 08 Jan 2020 00:00:00 +0300</pubDate></item><item><guid>https://julius383.github.io/posts-output/2019-06-27-makefile-madness/</guid><link>https://julius383.github.io/posts-output/2019-06-27-makefile-madness/</link><title>Makefile Madness</title><description>Make sometimes gets a bad rap mainly for some warts in it that are a
+result of how old it is. It does have it's merits though since even in 2019
+you are still more than likely to find a Makefile somewhere in most open
+source project's repositories.In this article I'll try and talk about the coolest/strangest features.
+This article is not meant to teach you how to write a Makefile, why you
+should bother learning, or the best practices. There are plenty of good
+guides as well as entire books dedicated to the topic of Make (I like the
+official GNU Documentation).</description><pubDate>Thu, 27 Jun 2019 00:00:00 +0300</pubDate></item><item><guid>https://julius383.github.io/posts-output/2019-05-07-writing-a-command-for-ranger/</guid><link>https://julius383.github.io/posts-output/2019-05-07-writing-a-command-for-ranger/</link><title>Writing a Command for Ranger</title><description>Backgroundranger is a terminal-based file manager that is written in Python.
+This is interesting for a couple of reasons. One is that it nicely
+integrates with the rest of the terminal. Another is that it can be
+extended fairly easily. It also supports vim-like key bindings. That last
+one may not seem like a merit but the interface ends up being really
+intuitive.</description><pubDate>Tue, 07 May 2019 00:00:00 +0300</pubDate></item><item><guid>https://julius383.github.io/posts-output/2019-03-24-coloring-arbitrary-shell-output/</guid><link>https://julius383.github.io/posts-output/2019-03-24-coloring-arbitrary-shell-output/</link><title>Colouring arbitrary shell output</title><description>I do a lot of my work on the command line and consequently are often staring
+at large amounts of text. This isn't much of a problem when working with code
+in any decent editor but firing one up isn't always necessary
+especially when you don't need to make any edits. For just inspecting the
+output of a command less is often enough but it lacks the syntax highlighting
+you get from an editor.A while ago I found the pygments project that provides a utility
+called pygmentize which allows you to highlight code by running a command and
+supports various forms of output like html and ANSI escape codes for the
+terminal. What this means is you could just run pygmentize -g code.py | less -R
+and have syntax highlighting outside an editor. Another tool bat
+works in a similar way but knows to use $PAGER so I don't have to manually
+pipe output into less when dealing with text that won't fit on screen.</description><pubDate>Sun, 24 Mar 2019 00:00:00 +0300</pubDate></item><item><guid>https://julius383.github.io/posts-output/2019-03-22-data-flow-on-the-shell/</guid><link>https://julius383.github.io/posts-output/2019-03-22-data-flow-on-the-shell/</link><title>Data flow on the shell</title><description>PipesIf you've ever spent more than two seconds on anything resembling a Unix shell -
+bash and friends - you've probably used a pipe. Basically a shell pipe,
+represented by the bar character (|) on a keyboard, is a way of connecting the
+output of one command to the input of another. Here's one example taken from my
+shell history that changes all the .txt (text) files in the current and sub
+directories to .md (markdown) files:</description><pubDate>Fri, 22 Mar 2019 00:00:00 +0300</pubDate></item></channel></rss>

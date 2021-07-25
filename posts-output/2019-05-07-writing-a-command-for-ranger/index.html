@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>saveandrun: Writing a Command for Ranger</title>
+        
+<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,cryptography,git,datalog,python">
+
+<meta name="description" content="Backgroundranger is a terminal-based file manager that is written in Python.
+This is interesting for a couple of reasons. One is that it nicely
+integrates with the rest of the terminal. Another is that it can be
+extended fairly easily. It also supports vim-like key bindings. That last
+one may not seem like a merit but the interface ends up being really
+intuitive.">
+<meta property="og:description" content="Backgroundranger is a terminal-based file manager that is written in Python.
+This is interesting for a couple of reasons. One is that it nicely
+integrates with the rest of the terminal. Another is that it can be
+extended fairly easily. It also supports vim-like key bindings. That last
+one may not seem like a merit but the interface ends up being really
+intuitive.">
+
+<meta property="og:url" content="https://julius383.github.io/posts-output/2019-05-07-writing-a-command-for-ranger/" />
+<meta property="og:title" content="Writing a Command for Ranger" />
+<meta property="og:type" content="article" />
+
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link
+            href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700|Inconsolata:700|Alegreya:500,700|Alegreya+Sans:400|Roboto:400,700"
+            type="text/css"
+            rel="stylesheet"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-32x32.png"
+            sizes="32x32"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-16x16.png"
+            sizes="16x16"
+            />
+        <link href="/css/main.css" rel="stylesheet" type="text/css" />
+        <link href="/css/prism.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+
+        <div class="container">
+            <nav class="nav">
+                <div class="nav-left" id="site-title">
+                    <a href="/">saveandrun</a>
+                </div>
+                <div class="nav-right">
+                    <a title="archives" href="/archives/">archives</a>
+                    <a title="tags" href="/tags/">tags</a>
+                    <a title="rss" href="/feed.xml">rss</a>
+                    <button id="themeToggle" class="button icon-only" onclick="toggleTheme()"></button>
+                </div>
+            </nav>
+            <hr>
+            
+<div id="post">
+    <div class="post-header">
+    <h1 class="text-center text-capitalize page-title">Writing a Command for Ranger</h1>
+    <div id="post-meta" class="text-center">
+        May 7, 2019
+    </div>
+
+    
+    <div class="text-center">
+        
+            
+                <b>[</b>
+            
+            <a href="/tags-output/tools/">tools</a>
+            
+                ,
+            
+        
+            
+            <a href="/tags-output/python/">python</a>
+            
+                <b>]</b>
+                
+        
+    </div>
+    
+    <br/>
+</div>
+<div>
+    
+    <h2 id="background">Background</h2><p><a href="https://ranger.github.io/">ranger</a> is a terminal-based file manager that is written in Python.
+This is interesting for a couple of reasons. One is that it nicely
+integrates with the rest of the terminal. Another is that it can be
+extended fairly easily. It also supports vim-like key bindings. That last
+one may not seem like a merit but the interface ends up being really
+intuitive.</p><p>As part of my ongoing effort to be more organized I decided it's about
+time I sort my wallpaper collection. At first glance there's a couple of
+ways to do this. But, by far the simplest is using sub-directories for each
+distinct category. The problem is, even using  <code>ranger</code> with its simple and
+intuitive interface ends up still being a lot of busy work. We all hate
+busy work but as programmers we can potentially do something about it
+(<a href="https://xkcd.com/1205/">relevant xkcd</a>).</p><h2 id="organizing-images-into-sub-directories">Organizing Images Into Sub-directories</h2><p>The best way I could think of to save myself some time is to somehow bind a
+key (like Space) to an arbitrary sequence of commands. Performing an action
+which in this case would be moving whichever file is selected to some
+sub-directory would just involve hitting a key. All that was left was actually implementing it.</p><p>Ranger is extended simply by adding a subclass of the <code>Command</code> class to
+a file called <code>commands.py</code> in the ranger config directory. A sample
+<code>commands.py</code> can be obtained by running</p><pre><code class="language-sh">ranger --copy-config=commands
+</code></pre><p>The two methods of the <code>Command</code> class you should be concerned with are
+<code>execute</code> and <code>tab</code>. The former should contain the code you want to run
+when your command is executed. The latter can be used to provide completion
+options when a user hits the <code>tab</code> key. For our purposes implementing
+tab-completion isn't really necessary.</p><p>From what we've discussed so far, our new command needs to:</p><ul><li>Parse the sequence of commands entered by the user,</li><li>Interpret special placeholders representing either the currently selected
+file or the current working directory,</li><li>Map the Space key to the user specified command sequence,</li><li>and, optionally restore the Space key to whatever it was. This isn't
+necessary since the remapping lasts only until <code>ranger</code> is closed.</li></ul><h2 id="the-code">The Code</h2><pre><code class="language-py">
+class bspace(Command):
+    """:bspace [command]
+
+    Temporarily bind a command to the space bar. {file} is
+    replaced with the currently selected item and {cwd} with
+    the current working directory. Run without arguments to
+    restore the original binding.
+    """
+
+    def execute(self):
+        # default binding for &lt;Space&gt;
+        orig_binding = "mark_files toggle=True"
+        if len(self.args) == 1:
+            new_binding = orig_binding
+        else:
+            resolved_args = []
+            for arg in self.args[1:]:
+                # replace {file} with current file in command
+                if arg == '{file}':
+                    resolved_args.append('%p')
+                # replace {cwd} with current working directory
+                elif arg == '{cwd}':
+                    resolved_args.append('%d')
+                else:
+                    resolved_args.append(arg)
+            new_binding = ' '.join(resolved_args)
+        self.fm.execute_console(f"map &lt;Space&gt; {new_binding}")
+</code></pre><p>To use the command simply enter a command that you want to temporarily
+bind to the Space key after <code>:bspace</code> in the ranger console. A couple of
+useful examples are:</p><ul><li><code>:bspace delete {file}</code> - deleting a file (please be careful).</li><li><code>:bspace chain copy;cd ../paste;cd {cwd}</code> - copy a file to the parent
+directory.</li><li><code>:bspace shell cat {file} &gt;&gt; somefile.txt</code> - appending to a particular
+file.</li><li><code>:bspace chain cut;cd landscapes;paste;cd {cwd}</code> - the command we need
+to organize images into sub-directories. Since ranger supports image
+previews, all we need to do is go through the directory and hit Space
+on every landscape image and it is moved to the relevant directory.
+<code>landscapes</code> in the command can be changed when we want to put an image
+in a different directory.</li></ul><p>Here's a gif of our command in action
+<img src="/assets/action.gif" alt="Command demo gif" /></p><h2 id="further-reading">Further Reading</h2><ul><li>The <a href="https://github.com/ranger/ranger/wiki/Custom-Commands">ranger wiki</a> has some great examples of custom commands.</li><li>The Arch Wiki ahas <a href="https://wiki.archlinux.org/index.php/Ranger#Tips_and_tricks&lt;Paste&gt;">a great page</a> about ranger.</li><li>The <a href="https://github.com/ranger/ranger/wiki/Official-user-guide">Official User Guide</a>.</li><li>The complete code can be found in a <a href="https://gist.github.com/julius383/1001e0b0a5a8da01873d2747e8af2736">gist</a>.</li><li>I recently found <a href="https://tmsu.org/">TMSU</a> which is a way to tag files and browse them
+through a virtual file-system (I haven't had time to try it though
+so can't say if it's any good)</li></ul>
+</div>
+
+    <div id="prev-next">
+        
+        <a class="pull-left button clear" href="/posts-output/2019-06-27-makefile-madness/">&laquo; Makefile Madness</a>
+        
+        
+        <a class="pull-right button clear" href="/posts-output/2019-03-24-coloring-arbitrary-shell-output/">Colouring arbitrary shell output &raquo;</a>
+        
+        <br>
+    </div>
+
+</div>
+
+            <hr/>
+        </div>
+        <script src="/js/prism.js" type="application/javascript"></script>
+        <script>
+            if (window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+                let element = document.getElementById('themeToggle');
+                element.classList.add("dark");
+            }
+            function toggleTheme() {
+                document.body.classList.toggle("dark");
+                let element = document.getElementById('themeToggle');
+                element.classList.toggle("dark");
+                element.classList.add("animate");
+                setTimeout(function(){
+                    element.classList.remove('animate');
+                }, 500);
+            }
+        </script>
+        
+        
+    </body>
+</html>

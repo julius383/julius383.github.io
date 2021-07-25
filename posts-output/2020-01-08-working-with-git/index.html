@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>saveandrun: Working With Git</title>
+        
+<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,cryptography,git,datalog,python">
+
+<meta name="description" content="git is an extremely useful tool that should be part of any serious
+developer&#39;s toolkit. If this is the first time hearing about it, the
+short version is that it allows you to track different versions of your
+files. This allows you to make significant changes without worrying
+about losing important work and, for multiple people to contribute to a
+project with the least amount of friction. With that said, this is by
+by no means an introduction to git but an exposition of some features
+that may help improve your productivity once you learn it.Empty Commit Messages">
+<meta property="og:description" content="git is an extremely useful tool that should be part of any serious
+developer&#39;s toolkit. If this is the first time hearing about it, the
+short version is that it allows you to track different versions of your
+files. This allows you to make significant changes without worrying
+about losing important work and, for multiple people to contribute to a
+project with the least amount of friction. With that said, this is by
+by no means an introduction to git but an exposition of some features
+that may help improve your productivity once you learn it.Empty Commit Messages">
+
+<meta property="og:url" content="https://julius383.github.io/posts-output/2020-01-08-working-with-git/" />
+<meta property="og:title" content="Working With Git" />
+<meta property="og:type" content="article" />
+
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link
+            href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700|Inconsolata:700|Alegreya:500,700|Alegreya+Sans:400|Roboto:400,700"
+            type="text/css"
+            rel="stylesheet"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-32x32.png"
+            sizes="32x32"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-16x16.png"
+            sizes="16x16"
+            />
+        <link href="/css/main.css" rel="stylesheet" type="text/css" />
+        <link href="/css/prism.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+
+        <div class="container">
+            <nav class="nav">
+                <div class="nav-left" id="site-title">
+                    <a href="/">saveandrun</a>
+                </div>
+                <div class="nav-right">
+                    <a title="archives" href="/archives/">archives</a>
+                    <a title="tags" href="/tags/">tags</a>
+                    <a title="rss" href="/feed.xml">rss</a>
+                    <button id="themeToggle" class="button icon-only" onclick="toggleTheme()"></button>
+                </div>
+            </nav>
+            <hr>
+            
+<div id="post">
+    <div class="post-header">
+    <h1 class="text-center text-capitalize page-title">Working With Git</h1>
+    <div id="post-meta" class="text-center">
+        Jan 8, 2020
+    </div>
+
+    
+    <div class="text-center">
+        
+            
+                <b>[</b>
+            
+            <a href="/tags-output/tools/">tools</a>
+            
+                ,
+            
+        
+            
+            <a href="/tags-output/git/">git</a>
+            
+                <b>]</b>
+                
+        
+    </div>
+    
+    <br/>
+</div>
+<div>
+    
+    <p><code>git</code> is an extremely useful tool that should be part of any serious
+developer's toolkit. If this is the first time hearing about it, the
+short version is that it allows you to track different versions of your
+files. This allows you to make significant changes without worrying
+about losing important work and, for multiple people to contribute to a
+project with the least amount of friction. With that said, this is by
+by no means an introduction to <code>git</code> but an exposition of some features
+that may help improve your productivity once you learn it.</p><h2 id="empty-commit-messages">Empty Commit Messages</h2><p>Why someone may want this is not immediately obvious but the reason is
+that sometimes a commit doesn't really require text explaining it. As part
+of each commit <code>git</code> stores the files that changed and the corresponding
+changes. This is already more than in enough information in some cases.
+Where I use this is in the <code>git</code> repo tracking all my configurations.
+Files like <code>.zshrc</code>, <code>.tmux.conf</code> and a lot of other things in
+<code>~/.config</code>. The contents change semi-regularly and having to describe
+what changed in every commit with a message would be painful. So the
+solution is the following line in my <code>crontab</code>:</p><pre><code class="language-sh">0 */6 * * * cd /home/kajm/.dotfiles &amp;&amp; git commit --allow-empty-message -am ''
+</code></pre><p>As you may have already guessed the flag <code>--allow-empty-message</code> is what
+makes <code>-m ''</code> possible.</p><h2 id="watch-important-files-for-changes">Watch Important Files For Changes</h2><p>This one relies on <a href="https://eradman.com/entrproject/">entr</a> which watches a list of files for changes and
+does something afterward. There's a lot of different file watchers but
+this one in particular I have found to be the most useful. Now since <code>entr</code>
+takes a file list from <code>stdin</code> means that we can use <code>git ls-files</code> in a
+repo to watch for changes to only files we have committed. Files that are
+committed are often the only ones we care about so this is a lot nicer
+than filtering the output of <code>find</code> or <code>ls</code>. The relevant snippet is:</p><pre><code class="language-sh">git ls-files | entr -cr node app.js
+</code></pre><p>Which just reloads a <code>node.js</code> application when the checked in files change.
+One other task I use this for is regenerating <code>.love</code> files in the background
+when working on a <a href="https://love2d.org/">LÖVE2D</a> game by simply running <code>Make</code>.</p><pre><code class="language-sh">(fd -e lua | entr -p make &gt; /dev/null &amp;)
+</code></pre><p>Here I'm using <a href="https://github.com/sharkdp/fd">fd</a> as opposed to <code>find</code> because doing things like
+searching by extension is easier.<sup id="fnref-1"><a class="footnote-ref" href="#fn-1">1</a></sup></p><h2 id="saving-online-credentials">Saving Online Credentials</h2><p>Firstly a disclaimer, this method stores your credentials (username +
+password) in a file <code>.git-credentials</code> in plaintext. This may pose a
+security issue but if that isn't really a concern then you're good to go.</p><pre><code class="language-sh">git config credential.helper store
+</code></pre><p>Once you type this, the next time you do an operation that requires
+entering some credentials (like <code>git pull</code>) they will be saved. If you
+later want to disable storage remove the credentials file and use:</p><pre><code class="language-sh">git config --system --unset credential.helper
+</code></pre><p>Optionally, storing credentials for a short-period is also possible with:</p><pre><code class="language-sh">git config --global credential.helper cache
+</code></pre><p>The credentials are kept for a default of 15 minutes but duration can be
+supplied by changing <code>cache</code> to <code>'cache --timeout=&lt;seconds&gt;'</code>.</p><h2 id="gitignore-patterns"><code>.gitignore</code> Patterns</h2><p>For the most part the pattern rules are straight-forward but there
+are some key things to pay attention to:</p><ul><li>The backslash (<code>'\'</code>) character is used for escaping e.g for end of line
+spaces or patterns beginning with a <code>#</code> or <code>!</code>.</li><li>A <code>!</code> at the beginning of a pattern negates its meaning.</li><li>A leading forward slash does not change the meaning of a pattern that
+has a forward slash elsewhere in the pattern i.e site/css and /site/css
+are the same.</li><li>A trailing forward slash on a pattern matches only directories but
+both files and directories when left out.</li></ul><h2 id="addendum">Addendum</h2><ul><li>You can find templates for <code>.gitignore</code> files <a href="https://gitignore.io/">here</a>.</li><li><code>git config --get remote.origin.url</code> prints the remote when run inside
+a repo you cloned.</li></ul><h2 id="further-reading">Further Reading</h2><ul><li>The <a href="https://git-scm.com/book/en/v2/Git-Tools-Credential-Storage">Credential Storage</a> section of the <code>git</code> book.</li><li>The <a href="https://git-scm.com/docs/gitignore">gitignore</a> documentation section.</li></ul><div class="footnotes"><hr /><ol><li id="fn-1"><p>The whole thing is in a subshell so it can be backgrounded.</p><a href="#fnref-1" class="footnote-backref">↩</a></li></ol></div>
+</div>
+
+    <div id="prev-next">
+        
+        <a class="pull-left button clear" href="/posts-output/2020-01-24-generating-mazes-with-haskell-part-1/">&laquo; Generating Mazes with Haskell: Part 1</a>
+        
+        
+        <a class="pull-right button clear" href="/posts-output/2019-06-27-makefile-madness/">Makefile Madness &raquo;</a>
+        
+        <br>
+    </div>
+
+</div>
+
+            <hr/>
+        </div>
+        <script src="/js/prism.js" type="application/javascript"></script>
+        <script>
+            if (window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+                let element = document.getElementById('themeToggle');
+                element.classList.add("dark");
+            }
+            function toggleTheme() {
+                document.body.classList.toggle("dark");
+                let element = document.getElementById('themeToggle');
+                element.classList.toggle("dark");
+                element.classList.add("animate");
+                setTimeout(function(){
+                    element.classList.remove('animate');
+                }, 500);
+            }
+        </script>
+        
+        
+    </body>
+</html>

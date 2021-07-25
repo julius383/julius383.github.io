@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>saveandrun: Implementing Asemica: A Markov Chain Based Cipher</title>
+        
+<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,cryptography,git,datalog,python">
+
+<meta name="description" content="What exactly is a cipher? To put it simply it is an algorithm for
+performing encryption and decryption. Encryption being the process a piece
+of information (known as plaintext) is transformed into an alternate
+form (known as ciphertext) in such a way that knowing only the content
+of the ciphertext can not lead to knowing the content of the plaintext.
+Decryption is going the other way from ciphertext to plaintext.
+Both encryption and decryption rely on a key that drives the operation
+of the cipher. When the key changes ideally the same piece of plaintext
+should produce a different piece of ciphertext but the result of applying
+the right key to the right ciphertext should always lead to the same
+plaintext. A key then is the one piece of information (other than the
+plaintext obviously) that must remain secret. There are a lot of finer
+points but that is the gist of it.One other thing necessary to know before going into the discussion of
+the Asemica cipher is what a Markov chain is. The precise definition
+can be found on WikiPedia. For our purposes all you need to know is
+that it is a model where the probability of one event occurring depends
+only on the value (state) of the preceding event. That still sounds a bit
+cryptic but it&#39;ll become clearer later on.">
+<meta property="og:description" content="What exactly is a cipher? To put it simply it is an algorithm for
+performing encryption and decryption. Encryption being the process a piece
+of information (known as plaintext) is transformed into an alternate
+form (known as ciphertext) in such a way that knowing only the content
+of the ciphertext can not lead to knowing the content of the plaintext.
+Decryption is going the other way from ciphertext to plaintext.
+Both encryption and decryption rely on a key that drives the operation
+of the cipher. When the key changes ideally the same piece of plaintext
+should produce a different piece of ciphertext but the result of applying
+the right key to the right ciphertext should always lead to the same
+plaintext. A key then is the one piece of information (other than the
+plaintext obviously) that must remain secret. There are a lot of finer
+points but that is the gist of it.One other thing necessary to know before going into the discussion of
+the Asemica cipher is what a Markov chain is. The precise definition
+can be found on WikiPedia. For our purposes all you need to know is
+that it is a model where the probability of one event occurring depends
+only on the value (state) of the preceding event. That still sounds a bit
+cryptic but it&#39;ll become clearer later on.">
+
+<meta property="og:url" content="https://julius383.github.io/posts-output/2020-04-15-implementing-asemica-a-markov-chain-based-cipher/" />
+<meta property="og:title" content="Implementing Asemica: A Markov Chain Based Cipher" />
+<meta property="og:type" content="article" />
+
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link
+            href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700|Inconsolata:700|Alegreya:500,700|Alegreya+Sans:400|Roboto:400,700"
+            type="text/css"
+            rel="stylesheet"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-32x32.png"
+            sizes="32x32"
+            />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/assets/favicon-16x16.png"
+            sizes="16x16"
+            />
+        <link href="/css/main.css" rel="stylesheet" type="text/css" />
+        <link href="/css/prism.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+
+        <div class="container">
+            <nav class="nav">
+                <div class="nav-left" id="site-title">
+                    <a href="/">saveandrun</a>
+                </div>
+                <div class="nav-right">
+                    <a title="archives" href="/archives/">archives</a>
+                    <a title="tags" href="/tags/">tags</a>
+                    <a title="rss" href="/feed.xml">rss</a>
+                    <button id="themeToggle" class="button icon-only" onclick="toggleTheme()"></button>
+                </div>
+            </nav>
+            <hr>
+            
+<div id="post">
+    <div class="post-header">
+    <h1 class="text-center text-capitalize page-title">Implementing Asemica: A Markov Chain Based Cipher</h1>
+    <div id="post-meta" class="text-center">
+        Apr 15, 2020
+    </div>
+
+    
+    <div class="text-center">
+        
+            
+                <b>[</b>
+            
+            <a href="/tags-output/factor/">factor</a>
+            
+                ,
+            
+        
+            
+            <a href="/tags-output/cryptography/">cryptography</a>
+            
+                <b>]</b>
+                
+        
+    </div>
+    
+    <br/>
+</div>
+<div>
+    
+    <p>What exactly is a cipher? To put it simply it is an algorithm for
+performing encryption and decryption. Encryption being the process a piece
+of information (known as plaintext) is transformed into an alternate
+form (known as ciphertext) in such a way that knowing only the content
+of the ciphertext can not lead to knowing the content of the plaintext.
+Decryption is going the other way from ciphertext to plaintext.
+Both encryption and decryption rely on a key that drives the operation
+of the cipher. When the key changes ideally the same piece of plaintext
+should produce a different piece of ciphertext but the result of applying
+the right key to the right ciphertext should always lead to the same
+plaintext. A key then is the one piece of information (other than the
+plaintext obviously) that must remain secret. There are a lot of finer
+points but that is the gist of it.</p><p>One other thing necessary to know before going into the discussion of
+the Asemica cipher is what a Markov chain is. The precise definition
+can be found on <a href="https://en.wikipedia.org/wiki/Markov_chain">WikiPedia</a>. For our purposes all you need to know is
+that it is a model where the probability of one event occurring depends
+only on the value (state) of the preceding event. That still sounds a bit
+cryptic but it'll become clearer later on.</p><h2 id="how-asemica-operates">How Asemica Operates</h2><p>Before we begin I'd like to state that the algorithm was formulated by
+a person called <a href="https://danne.stayskal.com/">Danne Stayskal</a> and the original implementation (in
+Perl) is available in their <a href="https://github.com/linenoise/asemica">GitHub</a> profile. I cannot recall how I
+found it initially but it was only until recently that I decided to try
+and figure out how it works by re-implementing it in a language I am more
+familiar with.</p><p>The reason I waited until recently to start my re-implementation effort
+was because of needing to learn a bit of Perl to use for scripting on
+Linux. Perl is a bit famous (infamous?) for being hard to read but after
+only going through a few chapters of <a href="https://isbnsearch.org/isbn/9781491954324">Learning Perl</a> and a healthy
+amount of comments in the original source for Asemica, I was able to
+understand how it works enough to write my own version.</p><p>Asemica relies on a regular document of text as a key. In order to
+understand how it works it is necessary to understand how a document is
+used as a key. The first step of the Asemica algorithm is turning the
+document key into a table of unique words present in the document. For
+any given word we keep track of all the words that appear directly after
+it anywhere in the text and how many times they do. For ease of reference
+the sequence of words-that-follow will be called <em>doors</em> and <em>exits</em> when
+the sequence includes the occurrences.</p><p>After this mapping of words and their associated information - which we'll
+refer to as the <em>transition table</em> - is created, those words with 15 or
+more different words following it are considered <em>meaningful</em> as they are
+able to represent a half a byte of information. All others are considered
+meaningless. This table is used to carry out both encryption and
+decryption.</p><h3 id="encryption">Encryption</h3><p>During encryption the plaintext is converted into a sequence of bytes
+which are further converted into binary strings then grouped into half-byte
+numbers (nibbles)<sup id="fnref-1"><a class="footnote-ref" href="#fn-1">1</a></sup>. Then beginning a randomly chosen word from those
+present in the document key which we will refer to as a <em>token</em> the
+following series of steps is repeated until the nibble sequence is empty:</p><ul><li>The current <em>token</em> is appended to the ciphertext result string.</li><li>If the token is <em>meaningful</em> then a single value is popped from the
+sequence of half-byte numbers and its integer value used to index
+the list of <em>doors</em>.
+This word becomes the next <em>token</em>.</li><li>If the <em>token</em> is not <em>meaningful</em> we randomly pick one of the <em>doors</em>
+and use that as the <em>token</em> in the next iteration.</li></ul><p>As we can see moving from one <em>token</em> to the next is wholly dependent on
+the value of the previous <em>token</em> which is exactly the type of relationship
+that a Markov chain describes. The probability of moving to a state in
+<em>doors</em> is $1/n$ where $n$ is the length of the <em>doors</em> sequence and
+that of moving to a state not in <em>doors</em> is $0$.</p><h3 id="decryption">Decryption</h3><p>During decryption, the ciphertext is first split into a list of words.
+The <em>words</em> list is iterated over until the second last element and
+the following steps are carried out:</p><ul><li>Check if the current word is <em>meaningful</em> skipping it otherwise since
+it could not have been used to encode a nibble.</li><li>Try and find the next word's index within the current word's
+<em>doors</em>.</li><li>This index is converted into a binary string and appended to the
+plaintext result string.</li></ul><p>At the end of the loop the plaintext string is just a long binary string
+and not the intended message. To convert back into whatever was encrypted
+the binary string is divided into groups of 8 (binary) characters.
+These characters represent a single byte and are converted back
+into the ASCII value they represent. The resulting string is the
+original message.</p><h2 id="concrete-implementation">Concrete Implementation</h2><p>To implement Asemica I chose the <a href="http://factorcode.org">Factor</a> programming language which is
+described on the homepage as:</p><blockquote><p>a concatenative, stack-based programming language with high-level
+features including dynamic types, extensible syntax, macros, and
+garbage collection.</p></blockquote><p>Apart from the features listed above one more that I think is useful is
+the <a href="https://docs.factorcode.org/content/article-listener.html">listener</a> - basically an enhanced REPL - which is helpful for
+interactive development.</p><h3 id="representing-a-transition">Representing A Transition</h3><p>The first detail to work out is how to represent the information present
+in each entry of the transition table. For this we'll use a <a href="https://docs.factorcode.org/content/article-tuple-examples.html">Tuple</a>
+which is similar to data classes in other languages. The syntax is
+pretty straightforward<sup id="fnref-2"><a class="footnote-ref" href="#fn-2">2</a></sup>:</p><pre><code class="language-factor">TUPLE: transition
+{ token      string }  ! raw string as it  appeared
+{ seen       integer } ! how many times token has been seen
+{ door       vector }  ! words after this one in document key
+{ doors      integer } ! length of door vector
+{ exits      assoc }   ! words after plus occurrence count
+meaningful             ! true or false depending if doors &gt; 15 ;
+</code></pre><p>The following is a <code>transition</code> value for one word. The key file used
+was Metamorphosis by Franz Kafka downloaded from
+<a href="https://www.gutenberg.org/">Project Gutenberg</a> as a text file:</p><pre><code class="language-json">{
+    "token": "eBook",
+    "seen": 12,
+    "door": [
+        "of",
+        "is",
+        "or",
+        "Details",
+        "First",
+        "METAMORPHOSIS",
+        "complying",
+        "for"
+    ],
+    "doors": 8,
+    "exits": [
+        [ "of", 2 ],
+        [ "is", 2 ],
+        [ "or", 2 ],
+        [ "Details", 1 ],
+        [ "First", 1 ],
+        [ "METAMORPHOSIS", 2 ],
+        [ "complying", 1 ],
+        [ "for", 1 ]
+    ],
+    "meaningful": false
+}
+</code></pre><h3 id="generating-the-transition-table">Generating the Transition Table</h3><p>The next step is actually building the <em>transition table</em>. To do this as
+we saw earlier requires iterating through all the words in the document
+key and checking which word follows each and updating the relevant
+<code>transition</code> tuple. Rather than using an indexed loop on a single stream
+of tokens I instead opted to use the <code>2each</code> combinator<sup id="fnref-3"><a class="footnote-ref" href="#fn-3">3</a></sup> which requires
+two sequences and a quotation on the stack. It is roughly equivalent to
+the following Python snippet:</p><pre><code class="language-python">def two_each(seq1, seq2, f):
+  for a, b in zip(seq1, seq2):
+    f(a, b)
+
+# example usage
+two_each(range(5), range(1, 5), print)
+
+# example output
+0 1
+1 2
+2 3
+3 4
+</code></pre><p>We can already guess how to pair up each word with the one that follows
+it and run a function on it<sup id="fnref-4"><a class="footnote-ref" href="#fn-4">4</a></sup>.</p><pre><code class="language-factor">: 2tokens ( str -- a b )
+    clean-string " " split dup rest ;
+
+:: generate-transitions ( a b -- table )
+    { } &gt;alist :&gt; ttable! ! create empty transition table
+    a b ! tokens
+    [
+        :&gt; value
+        :&gt; key
+        ! get transition tuple if it exists or make new one
+        key &gt;lower ttable new-or-existing
+        key &gt;&gt;token
+        ! update with information
+        value swap update-transition-info
+        ! modify the transition table
+        key &gt;lower ttable assoc-add ttable!
+    ] 2each ttable set-meaningful ; 
+</code></pre><p>The <code>2tokens</code> word produces the two sequences we need from a string after
+first cleaning the string (this is just removing extra spaces and
+newlines among other things). These two sequences are used as input to the
+<code>generate-transitions</code> word. Unlike most other stack-based programming languages, Factor allows using <a href="https://docs.factorcode.org/content/article-locals-examples.html">lexical variables</a> ( <code>::</code>, <code>:&gt;</code> ) which can be a lot more convenient than manipulating multiple different stack values.</p><h3 id="encryption-and-decryption">Encryption and Decryption</h3><p>The code responsible for encryption is not very complicated if you keep
+a few of these Factor specific things in mind:</p><ul><li>How lexical variables (including mutable ones) <a href="https://docs.factorcode.org/content/article-locals-examples.html">work</a> .</li><li>Arguments to words are taken from the stack.</li><li><code>length</code> does what you expect and <code>index array nth</code> is <code>array[index]</code>
+in Python.</li><li><code>key assoc at</code> is the same as <code>assoc[key]</code> where <code>assoc</code> would be
+a dictionary in Python.</li><li><code>seq unclip</code> puts the first element and the rest of the sequence on
+the stack in reverse order.</li><li><code>meaningful&gt;&gt;</code> is just how you access the slot named <code>meaningful</code> in
+a tuple<sup id="fnref-5"><a class="footnote-ref" href="#fn-5">5</a></sup>.</li></ul><p>The code for encryption is:</p><pre><code class="language-factor">
+:: encode ( message transitions tokens -- encmessage )
+    ! start with a random token
+    tokens length safe-random tokens nth :&gt; token! 
+    "" :&gt; encmessage!
+    ! transform input into sequence of nibbles
+    message unpack nibbles :&gt; nbs!
+    [ nbs empty? ] [ 
+        { encmessage token " " } concat encmessage!
+        token &gt;lower transitions at meaningful&gt;&gt;
+        [
+            ! encrypt a nibble into a word
+            nbs unclip
+            token &gt;lower transitions at door&gt;&gt;
+            nth token!
+            nbs!
+        ]
+        [
+         ! add random word to output without encrypting nibble
+         token &gt;lower transitions at doors&gt;&gt; safe-random
+         token &gt;lower transitions at door&gt;&gt; nth token!
+        ] if
+    ] until { encmessage token " " } concat ;
+</code></pre><p>For the decryption word other than what we have already mentioned keep in
+mind:</p><ul><li>Although iteration over structures is preferred over indexed iteration
+the latter is still possible by using <code>&lt;iota&gt;</code> (similar to <code>range</code> in
+Python) with the <code>each</code> combinator.</li><li><code>find</code> tries to find a value in a sequence that satisfies a quotation
+and puts the index and the value on the stack or false for both.</li><li><code>when</code> is like an if statement without an else section.</li></ul><p>The decryption code is:</p><pre><code class="language-factor">:: decode ( input transitions tokens -- decmessage )
+    "" :&gt; decoded!
+    input clean-string " " split :&gt; words
+    words length 1 - &lt;iota&gt; [
+        :&gt; i
+        i words transitions at-nth meaningful&gt;&gt;
+        [  
+            ! word encodes a nibble so try and find its value
+            i words transitions at-nth door&gt;&gt; [ 
+                &gt;lower i 1 + words nth &gt;lower =
+            ] find 
+            :&gt; elt
+            :&gt; idx
+            elt [ idx make-nibble decoded swap append decoded! ] when
+        ] when
+    ] each decoded pack ;
+</code></pre><p>One final detail necessary for understanding how encryption and
+decryption is done is the implementation of <code>pack</code> and <code>unpack</code>. They are
+written to mimic the behaviour of <code>pack</code> and <code>unpack</code> in Perl with <code>b*</code>
+as the template string. Here's <code>unpack</code>:</p><pre><code class="language-factor">: unpack ( str -- newstr )
+    [ &gt;bin 8 zero-pad reverse ] { } map-as "" join ;
+</code></pre><p>It converts a string such as "hello" into a binary string such as
+"0001011010100110001101100011011011110110". It does this by converting
+each character into a binary string (<code>&gt;bin</code>) then padding the string with
+zeros until it is at least length 8 (<code>8 zero-pad</code>). It then reverses the
+string to turn it into little endian form (least significant bit first).
+The result for each character is concatenated together into a single
+string.</p><p><code>pack</code> is slightly longer:</p><pre><code class="language-factor">:: pack ( str -- seq )
+   0 str length 8 &lt;range&gt; [
+        :&gt; start
+        start 8 + :&gt; end 
+        end str length &gt;
+        [ str length ] [ end ] if
+        start swap str subseq reverse bin&gt;
+   ] { } map-as but-last &gt;string ;
+</code></pre><p>It converts a string such as "0001011010100110001101100011011011110110"
+back into "hello". It does this by iterating through the string in groups
+of 8 characters (representing 1 byte / a single ASCII value). The 8
+characters form a string which is reversed (to turn it back into
+big endian form) before converting it back into an integer (<code>bin&gt;</code>). The
+result is a sequence of numbers which can then be converted into an ASCII
+string (<code>&gt;string</code>).</p><p>After adding a few other bits and pieces like argument parsing typical
+usage of the program is shown below:</p><pre><code class="language-shell">$ echo "Pwagu hupata pwaguzi" | factor-vm -i=cust.img asemica.factor \
+  -m enc -c metamorphosis.txt -o enc.txt
+$ cat enc.txt
+them It was ever was ever mentioned as they have expected something to
+make use several hours on his many steps and if somebody came to make
+use part and with all at seven I'll get enough of luxury For help her
+breast His bed perhaps any moment and when her Would go of an inch His
+right to just lay flat that gentle voice as clearly asked each other
+Whatever he thought It
+$ factor-vm -i=cust.img asemica.factor -m dec \
+  -c metamorphosis.txt -i enc.txt
+Pwagu hupata pwaguzi
+</code></pre><h2 id="appendix">Appendix</h2><ul><li>The entire code is available on <a href="https://github.com/julius383/asemica-factor">GitHub</a>.</li><li>As described in the <code>README</code> of the GitHub project generating an
+<a href="https://docs.factorcode.org/content/article-images.html">image</a> and passing it as an argument to the factor VM can
+significantly improve runtimes.</li><li>The choice of document key can lead to shorter ciphertexts with a
+longer text generally being better and some texts being completely
+unsuitable for use as a key.</li><li>A very good introduction to Factor is available <a href="https://andreaferretti.github.io/factor-tutorial/">here</a>.</li><li><a href="https://evincarofautumn.blogspot.com/2012/02/why-concatenative-programming-matters.html">This</a> article describes some of the reasons why concatenative
+programming is useful.</li><li>Factor has a lot of libraries so browsing the documentation can usually
+help you find what you want.</li><li>On Linux <code>Alt-+</code> increases the font size for the help browser and
+running <code>"Iosevka Custom" 25 set-listener-font</code> sets the font and its
+size for the listener.</li></ul><div class="footnotes"><hr /><ol><li id="fn-1"><p>The bytes represent the value of a particular character in ASCII
+although Unicode should work as well by changing how decoding is
+done.</p><a href="#fnref-1" class="footnote-backref">↩</a></li><li id="fn-2"><p>The types for tuple slots are entirely optional but are useful for
+documentation.</p><a href="#fnref-2" class="footnote-backref">↩</a></li><li id="fn-3"><p>A combinator is a word (function) that takes code as input usually
+in the form of a quotation which is an anonymous function.</p><a href="#fnref-3" class="footnote-backref">↩</a></li><li id="fn-4"><p>The first sequence is all the tokens and the second tokens is
+the same sequence without the first element.</p><a href="#fnref-4" class="footnote-backref">↩</a></li><li id="fn-5"><p>This would work for any tuple with a slot called <code>meaningful</code> not
+just our <code>transition</code> tuple.</p><a href="#fnref-5" class="footnote-backref">↩</a></li></ol></div>
+</div>
+
+    <div id="prev-next">
+        
+        <a class="pull-left button clear" href="/posts-output/2020-09-30-tips-for-an-improved-arch-linux-experience/">&laquo; Tips For An Improved Arch Linux Experience</a>
+        
+        
+        <a class="pull-right button clear" href="/posts-output/2020-04-05-querying-pacman-with-datalog/">Querying Pacman with Datalog &raquo;</a>
+        
+        <br>
+    </div>
+
+</div>
+
+            <hr/>
+        </div>
+        <script src="/js/prism.js" type="application/javascript"></script>
+        <script>
+            if (window.matchMedia &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+                let element = document.getElementById('themeToggle');
+                element.classList.add("dark");
+            }
+            function toggleTheme() {
+                document.body.classList.toggle("dark");
+                let element = document.getElementById('themeToggle');
+                element.classList.toggle("dark");
+                element.classList.add("animate");
+                setTimeout(function(){
+                    element.classList.remove('animate');
+                }, 500);
+            }
+        </script>
+        
+        
+    </body>
+</html>
