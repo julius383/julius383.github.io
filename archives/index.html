@@ -8,11 +8,9 @@
         <meta name="keywords" content="programming,python,linux,haskell">
         
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-        <link
-            href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700|Inconsolata:700|Alegreya:500,700|Alegreya+Sans:400|Roboto:400,700"
-            type="text/css"
-            rel="stylesheet"
-            />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;700&family=Oxygen:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
         <link
             rel="icon"
             type="image/png"
@@ -26,10 +24,10 @@
             sizes="16x16"
             />
         <link href="/css/main.css" rel="stylesheet" type="text/css" />
-        <link href="/css/prism.css" rel="stylesheet" type="text/css" />
+        <link href="/css/mine-highlightjs.min.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
-
+        <script>0</script>
         <div class="container">
             <nav class="nav">
                 <div class="nav-left" id="site-title">
@@ -48,6 +46,15 @@
     <div id="page-header">
         <h1>Archives</h1>
     </div>
+    
+        <h4>2023 November</h4>
+        <ul>
+        
+        <li>
+            Nov 27 - <a href="/posts-output/2023-11-27-using-a-genetic-algorithm-to-guess-arithmetic-equations-in-julia/">Using a Genetic Algorithm to Guess Arithmetic Equations in Julia</a>
+        </li>
+        
+        </ul>
     
         <h4>2020 September</h4>
         <ul>
@@ -120,7 +127,6 @@
 
             <hr/>
         </div>
-        <script src="/js/prism.js" type="application/javascript"></script>
         <script>
             if (window.matchMedia &&
                 window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -138,7 +144,9 @@
                 }, 500);
             }
         </script>
-        
-        
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="/js/highlight.pack.js" type="application/javascript"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
     </body>
 </html>

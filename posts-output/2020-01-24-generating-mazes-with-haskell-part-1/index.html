@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <title>saveandrun: Generating Mazes with Haskell: Part 1</title>
         
-<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,cryptography,git,datalog,python">
+<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,julia,cryptography,git,datalog,optimization,python">
 
 <meta name="description" content="One of the first big projects I worked on was generating mazes. After
 somehow coming across the book Mazes for Programmers (which to this
@@ -40,11 +40,9 @@ started.Representing Mazes">
 <meta property="og:type" content="article" />
 
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-        <link
-            href="https://fonts.googleapis.com/css?family=Fira+Mono:400,700|Inconsolata:700|Alegreya:500,700|Alegreya+Sans:400|Roboto:400,700"
-            type="text/css"
-            rel="stylesheet"
-            />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;700&family=Oxygen:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
         <link
             rel="icon"
             type="image/png"
@@ -58,10 +56,10 @@ started.Representing Mazes">
             sizes="16x16"
             />
         <link href="/css/main.css" rel="stylesheet" type="text/css" />
-        <link href="/css/prism.css" rel="stylesheet" type="text/css" />
+        <link href="/css/mine-highlightjs.min.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
-
+        <script>0</script>
         <div class="container">
             <nav class="nav">
                 <div class="nav-left" id="site-title">
@@ -285,7 +283,6 @@ mentioned competitor.</p><a href="#fnref-2" class="footnote-backref">↩</a></li
 
             <hr/>
         </div>
-        <script src="/js/prism.js" type="application/javascript"></script>
         <script>
             if (window.matchMedia &&
                 window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -303,7 +300,9 @@ mentioned competitor.</p><a href="#fnref-2" class="footnote-backref">↩</a></li
                 }, 500);
             }
         </script>
-        
-        
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="/js/highlight.pack.js" type="application/javascript"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
     </body>
 </html>

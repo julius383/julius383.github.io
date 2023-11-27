@@ -1,9 +1,10 @@
 @import url(chota.css);
 :root {
   --color-error: #CD113B;
-  --grid-maxwidth: 90rem;
-  --font-size: 2.2rem;
-  --font-family-sans: "Alegreya Sans", Roboto, sans-serif;
+  --grid-maxwidth: 85rem;
+  --font-size: 1.9em;
+  --font-family-sans: "Oxygen", Roboto, sans-serif;
+  --font-family-serif: "Playfair Display", Roboto, serif;
   --font-family-mono: "Fira Mono", Inconsolata, monospace;
 }
 
