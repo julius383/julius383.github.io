@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <title>saveandrun: Using a Genetic Algorithm to Guess Arithmetic Equations in Julia</title>
         
-<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,julia,cryptography,git,datalog,optimization,python">
+<meta name="keywords" content="graphs,tools,bash,factor,linux,haskell,shell,make,julia,cryptography,git,datalog,optimization,python,algorithms">
 
 <meta name="description" content="Genetic algorithms try to replicate the mechanisms of biological
 evolution to solve problems. In this article we&#39;ll use a somewhat useless
@@ -83,6 +83,12 @@ we&#39;d start with 20 then try and find an expression such as 4 * 5.">
             
             <a href="/tags-output/optimization/">optimization</a>
             
+                ,
+            
+        
+            
+            <a href="/tags-output/algorithms/">algorithms</a>
+            
                 <b>]</b>
                 
         
@@ -110,11 +116,11 @@ likely it is to for organisms carrying it to survive long enough to pass on
 their genes. This leads to the trait becoming more common in a population
 during successive generations. This process is natural selection which was the
 primary inspiration for genetic algorithms.</p><h2 id="genetic-algorithms">Genetic Algorithms</h2><p>Genetic algorithms are commonly used on problems where finding solutions
-through more direct means is too resource intensive to be feasible. They
-typically have a few key steps:</p><ol><li>Generating a random start population.</li><li>Selecting candidates for producing the next generation.</li><li>Using crossovers and mutations to create a new generation from the selected parents.</li><li>Checking if a solution has been found and terminating or going back to step 2.</li></ol><p>Each of the first 3 steps can vary in many different ways and how exactly you
+through more direct means is too resource intensive to be feasible, for
+example scheduling. They typically have a few key steps:</p><ol><li>Generating a random start population.</li><li>Selecting candidates for producing the next generation.</li><li>Using crossovers and mutations to create a new generation from the selected parents.</li><li>Checking if a solution has been found and terminating or going back to step 2.</li></ol><p>Each of the first 3 steps can vary in many different ways and how exactly you
 do each could influence the performance of the final algorithm as a whole. I'll
 try and keep things simple but I'll try to point out places where you could
-change things up for anyone interested in exploring alternate approaches.</p><h2 id="translating-the-problem-into-code">Translating the Problem into code</h2><p>There's a lot more involved in genetic algorithms than just 4 steps. The first
+change things up for anyone interested in exploring alternate approaches.</p><p><img src="/assets/genarith-diagram.png" alt="Diagrammatic description of genetic algorithms" /></p><h2 id="translating-the-problem-into-code">Translating the Problem into code</h2><p>There's a lot more involved in genetic algorithms than just 4 steps. The first
 thing we have to do is phrase our problem adequately. We need to figure
 out what constitutes a population and how are traits in each member
 represented so they can be "passed on". Keep in mind what we're trying to do
@@ -418,7 +424,7 @@ end
 rate. There isn't really a 'correct' value for these rates so you'd probably have
 to try different values and find what works for your particular problem or even
 just for this one.</p><p>Crossover swaps bits by creating a mask and extracting the bits in the
-required positions for each number before <code>OR</code>ing them in swapped order.</p><pre><code class="language-julia">const MUTATION_RATE = Float64(0.01)
+required positions for each number before <code>OR</code>ing them in swapped order.</p><p><img src="/assets/crossover-diagram.png" alt="Illustration of genetic crossover" /></p><pre><code class="language-julia">const MUTATION_RATE = Float64(0.01)
 
 function mutate(expression::EncodedExpression, rate::Float64 = MUTATION_RATE)
     if rand(Float64) &lt;= rate
@@ -433,7 +439,7 @@ end
 </code></pre><p>Mutation also involves creating a mask, but this time we simply <code>XOR</code> the
 chromosome with the mask to flip a bit at a randomly selected position. Since
 both these functions operate on bits let's make a function to show expressions
-as bit strings grouped into individual genes.</p><pre><code class="language-julia">asbitstring(expression::EncodedExpression) =
+as bit strings grouped into individual genes.</p><p><img src="/assets/mutation-diagram.png" alt="Illustration of genetic mutation" /></p><pre><code class="language-julia">asbitstring(expression::EncodedExpression) =
     string(expression, base = 2, pad = CHROMOSOME_SIZE)
 
 function showencoding(expression::EncodedExpression)
@@ -644,8 +650,7 @@ end
 it does. From my exploration, with the default arguments to <code>ga</code> we were unable
 to find a solution for numbers greater than 5000 more than 10% of the time. For
 numbers lower than 5000 the percentage was a considerably higher. That closes
-out our exploration of genetic algorithms. Be sure to leave any feedback in the
-comments.</p><p><img src="/assets/thumbs_up.gif" alt="Thumbs Up" /></p><h2 id="final-thoughts">Final Thoughts</h2><ul><li>The idea for this project can from <a href="http://www.ai-junkie.com/ga/intro/gat1.html">this</a> article. It has implementations
+out our exploration of genetic algorithms.</p><p><img src="/assets/thumbs_up.gif" alt="Thumbs Up" /></p><h2 id="final-thoughts">Final Thoughts</h2><ul><li>The idea for this project can from <a href="http://www.ai-junkie.com/ga/intro/gat1.html">this</a> article. It has implementations
 of the same problem in different languages. I tried this out about 5 years ago
 while learning C. It was a big nightmare but was the only non-trivial C
 project I completed outside some stuff with flex and bison.</li><li>Really liking Julia so far. I've barely scratched the surface of it's
