@@ -47,7 +47,7 @@ function remarkReadingTime() {
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
-  base: "/julius383.github.io/",
+  base: "/",
   integrations: [
     sitemap({
       filter: page => SITE.showArchives || !page.endsWith("/archives"),
