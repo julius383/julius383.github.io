@@ -1,0 +1,133 @@
+---
+import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import { PROJECTS } from "@/constants";
+
+interface Props {
+  limit?: number;
+}
+
+const { limit } = Astro.props;
+
+const projects = limit ? PROJECTS.slice(0, limit) : PROJECTS;
+---
+
+<section class="projects-section mb-2">
+  {limit && (
+  <h2 class="text-2xl font-semibold tracking-wide mb-4">Projects</h2>
+  )}
+  <div class="projects-grid">
+    {projects.map((project) => (
+      <article class="project-card">
+        <h3 class="project-name text-base font-medium m-0">{project.name}</h3>
+        <p class="project-desc text-sm leading-relaxed flex-1 m-0 font-mono">{project.description}</p>
+        {project.tags && (
+          <div class="project-tags flex flex-wrap gap-1.5">
+            {project.tags.map((tag) => (
+              <span class="tag text-xs font-mono tracking-wide px-2 py-0.5">{tag}</span>
+            ))}
+          </div>
+        )}
+        <div class="project-links flex gap-4 mt-auto pt-3">
+          <a href={project.repoURL.url} class="project-link lowercase flex items-center gap-1" target="_blank" rel="noopener">
+            {project.repoURL.title} ↗
+          </a>
+          {project.writeupURL && (
+            <a href={project.writeupURL.url} class="project-link lowercase">
+              {project.writeupURL.title}
+              <IconArrowRight class="w-4 h-4 inline-block rtl:-rotate-180" />
+            </a>
+          )}
+        </div>
+      </article>
+    ))}
+  </div>
+  <!-- after the .projects-grid div -->
+  {limit && (
+  <a href="/about" class="view-all block text-xs font-mono tracking-widest uppercase mt-4">
+      All projects
+      <IconArrowRight class="w-4 h-4 inline-block rtl:-rotate-180" />
+    </a>
+  )}
+</section>
+
+<style>
+  .view-all {
+    color: var(--accent);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.15s;
+  }
+
+  .view-all:hover { opacity: 1; }
+
+  .projects-section {
+    color: var(--foreground);
+    padding: 2.5rem 0;
+  }
+  .projects-section .project-link {
+    text-decoration: none;
+    border-bottom: 2px dashed var(--accent);
+  }
+  .projects-heading {
+    color: var(--accent);
+  }
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    align-items: start;
+    gap: 1px;
+  }
+
+  .project-card {
+    background: var(--background);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-right: 1px solid var(--border);
+    position: relative;
+    transition: background 0.2s ease;
+  }
+
+  .project-card:last-child { border-right: none; }
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .project-card:hover { background: var(--muted); }
+  .project-card:hover::before { opacity: 1; }
+  .project-name {
+    color: var(--foreground);
+  }
+
+    .project-desc {
+    color: #94a3b8;
+  }
+  .project-link {
+    color: var(--accent);
+    opacity: 0.8;
+    transition: opacity 0.15s;
+  }
+  .project-link:hover { opacity: 1; }
+
+  .tag {
+    /* @apply text-xs font-mono tracking-wide px-2 py-0.5; */
+    border-radius: 2px;
+    border: 1px solid var(--color-border);
+    color: #94a3b8;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .tag:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .project-links {
+    /* @apply flex gap-4 mt-auto pt-3; */
+    border-top: 1px solid var(--color-border);
+  }
+</style>

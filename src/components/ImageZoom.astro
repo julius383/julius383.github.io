@@ -1,0 +1,53 @@
+---
+// No props needed – behaviour is handled entirely client-side
+---
+
+<script>
+  function initZoom() {
+    const overlay = document.createElement('div');
+    overlay.id = 'zoom-overlay';
+    document.body.appendChild(overlay);
+
+    document.querySelectorAll('img.zoomable-img').forEach((img: any) => {
+      img.addEventListener('click', () => {
+        overlay.innerHTML = `<img src="${img.src}" alt="${img.alt}" />`;
+        overlay.classList.add('active');
+      });
+    });
+
+    overlay.addEventListener('click', () => {
+      overlay.classList.remove('active');
+    });
+  }
+
+  // Re-run on view transitions if you're using Astro's <ViewTransitions />
+  document.addEventListener('astro:page-load', initZoom);
+</script>
+
+<style is:global>
+  img.zoomable-img {
+    cursor: zoom-in;
+  }
+
+  #zoom-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    cursor: zoom-out;
+    place-items: center;
+  }
+
+  #zoom-overlay.active {
+    display: grid;
+  }
+
+  #zoom-overlay img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+</style>
