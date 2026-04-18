@@ -8,6 +8,7 @@
     "preview": "astro preview",
     "sync": "astro sync",
     "astro": "astro",
+    "deploy": "bun run build && cd dist && touch .nojekyll && git init && git add . && git commit -m 'Deploy' && git remote add origin https://github.com/julius383/julius383.github.io && git push origin main:gh-pages --force",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
     "lint": "eslint ."
