@@ -1,0 +1,604 @@
+<!DOCTYPE html><html dir="ltr" lang="en" class="scroll-smooth"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="canonical" href="https://julius383.github.io/posts/2020-04-15-implementing-asemica-a-markov-chain-based-cipher/"><meta name="generator" content="Astro v5.18.1"><!-- Load Font --><style>@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/b92787725bce141b.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:300;font-style:normal;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/07431a16dd76433e.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:400;font-style:normal;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/fe8426e418b1784b.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:500;font-style:normal;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/c5c4490645b295f5.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:600;font-style:normal;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/ffa1f1149b7accfe.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:700;font-style:normal;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/49b9cca8ada37f9e.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:300;font-style:italic;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/6577f535eac5545d.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:400;font-style:italic;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/b6299e19d0ae9382.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:500;font-style:italic;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/8988ce21ae98ae3f.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:600;font-style:italic;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/25cb2d9b508ca44d.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:700;font-style:italic;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:300;font-style:normal;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:500;font-style:normal;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:600;font-style:normal;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:700;font-style:normal;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:300;font-style:italic;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:italic;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:500;font-style:italic;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:600;font-style:italic;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:700;font-style:italic;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}:root{--font-inter:Inter-d49f7dbfaf5600d7,"Inter-d49f7dbfaf5600d7 fallback: Arial",sans-serif;}</style><link rel="preload" href="/_astro/fonts/07431a16dd76433e.woff2" as="font" type="font/woff2" crossorigin><style>@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/79260fa6547b8044.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:300;font-style:normal;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/cc5f60fd46e42cc9.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:400;font-style:normal;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/c8db80b9ce092d76.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:500;font-style:normal;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/626901e254b0251a.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:600;font-style:normal;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/4e13c01b98043a1e.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:700;font-style:normal;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/ba5c1fe9d3cc5168.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:300;font-style:italic;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/9161ee1cbda9cef9.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:400;font-style:italic;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/68c599f82a0105a9.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:500;font-style:italic;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/8dfad69e269bdbee.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:600;font-style:italic;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/fb2c38a94b4de7ed.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:700;font-style:italic;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:300;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:500;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:600;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:700;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:300;font-style:italic;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:400;font-style:italic;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:500;font-style:italic;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:600;font-style:italic;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:700;font-style:italic;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}:root{--font-jb-mono:"JetBrains Mono-c6e61e86b6cee3fd","JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New",monospace;}</style><link rel="preload" href="/_astro/fonts/cc5f60fd46e42cc9.woff2" as="font" type="font/woff2" crossorigin><!-- General Meta Tags --><title>Implementing Asemica: A Markov Chain Based Cipher | Julius Kibunjia&#39;s Blog</title><meta name="title" content="Implementing Asemica: A Markov Chain Based Cipher | Julius Kibunjia's Blog"><meta name="description" content="Factor implementation of a book keyed cipher, Asemica."><meta name="author" content="Julius Kibunjia"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="Implementing Asemica: A Markov Chain Based Cipher | Julius Kibunjia's Blog"><meta property="og:description" content="Factor implementation of a book keyed cipher, Asemica."><meta property="og:url" content="https://julius383.github.io/posts/2020-04-15-implementing-asemica-a-markov-chain-based-cipher/"><meta property="og:image" content="https://julius383.github.io/astropaper-og.jpg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"><!-- Article Published/Modified time --><meta property="article:published_time" content="2020-04-15T00:00:01.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://julius383.github.io/posts/2020-04-15-implementing-asemica-a-markov-chain-based-cipher/"><meta property="twitter:title" content="Implementing Asemica: A Markov Chain Based Cipher | Julius Kibunjia's Blog"><meta property="twitter:description" content="Factor implementation of a book keyed cipher, Asemica."><meta property="twitter:image" content="https://julius383.github.io/astropaper-og.jpg"><!-- Google JSON-LD Structured data --><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Implementing Asemica: A Markov Chain Based Cipher | Julius Kibunjia's Blog","image":"https://julius383.github.io/astropaper-og.jpg","datePublished":"2020-04-15T00:00:01.000Z","author":[{"@type":"Person","name":"Julius Kibunjia","url":"https://julius383.github.io"}]}</script><!-- Enable RSS feed auto-discovery  --><!-- https://docs.astro.build/en/recipes/rss/#enabling-rss-feed-auto-discovery --><link rel="alternate" type="application/rss+xml" title="Julius Kibunjia's Blog" href="https://julius383.github.io/rss.xml"><meta name="theme-color" content=""><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.CDGfc0hd.js"></script><!-- Minimal inline script to prevent FOUC - sets theme immediately --><script>
+      (function () {
+        const initialColorScheme = ""; // "light" | "dark"
+        const currentTheme = localStorage.getItem("theme");
+
+        function getPreferTheme() {
+          if (currentTheme) return currentTheme;
+          if (initialColorScheme) return initialColorScheme;
+          return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+
+        const themeValue = getPreferTheme();
+
+        // Set theme immediately to prevent flash
+        document.firstElementChild?.setAttribute("data-theme", themeValue);
+
+        // Export minimal API for external script
+        window.theme = {
+          themeValue: themeValue,
+          getTheme: () => window.theme.themeValue,
+          setTheme: val => {
+            window.theme.themeValue = val;
+          },
+        };
+      })();
+    </script><link rel="stylesheet" href="/_astro/about.CosKmhfb.css">
+<style>:where([data-astro-image]){object-fit:var(--fit);object-position:var(--pos);height:auto}:where([data-astro-image=full-width]){width:100%}:where([data-astro-image=constrained]){max-width:100%}
+@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media(prefers-reduced-motion){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}
+</style><style>[data-astro-transition-scope="astro-fam6wyqg-1"] { view-transition-name: implementing-asemica_3a-a-markov-chain-based-cipher; }@layer astro { ::view-transition-old(implementing-asemica_3a-a-markov-chain-based-cipher) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(implementing-asemica_3a-a-markov-chain-based-cipher) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(implementing-asemica_3a-a-markov-chain-based-cipher) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(implementing-asemica_3a-a-markov-chain-based-cipher) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-fam6wyqg-1"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-fam6wyqg-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-fam6wyqg-1"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-fam6wyqg-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-fam6wyqg-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-fam6wyqg-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-fam6wyqg-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-fam6wyqg-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style><style>[data-astro-transition-scope="astro-36ssibgs-2"] { view-transition-name: cryptography; }@layer astro { ::view-transition-old(cryptography) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(cryptography) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(cryptography) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(cryptography) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style><style>[data-astro-transition-scope="astro-36ssibgs-3"] { view-transition-name: factor; }@layer astro { ::view-transition-old(factor) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(factor) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(factor) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(factor) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style></head> <body>  <a id="skip-to-content" href="#main-content" class="absolute start-16 -top-full z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all focus:top-4">
+Skip to content
+</a> <header class="app-layout flex flex-col items-center justify-between sm:flex-row"> <div id="top-nav-wrap" class="py-4 sm:py-6 border-b border-border relative w-full bg-background flex items-baseline justify-between sm:items-center"> <a href="/" class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"> Julius Kibunjia&#39;s Blog </a> <nav id="nav-menu" class="flex w-full flex-col items-center sm:ms-2 sm:flex-row sm:justify-end sm:space-x-4 sm:py-0"> <button id="menu-btn" class="focus-outline self-end p-2 sm:hidden" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden" id="close-icon"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-menu-deep" id="menu-icon"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 6h16" /><path d="M7 12h13" /><path d="M10 18h10" /></svg> </button> <ul id="menu-items" class="mt-4 grid w-44 grid-cols-2 place-content-center gap-2 [&#38;>li>a]:block [&#38;>li>a]:px-4 [&#38;>li>a]:py-3 [&#38;>li>a]:text-center [&#38;>li>a]:font-medium [&#38;>li>a]:hover:text-accent sm:[&#38;>li>a]:px-2 sm:[&#38;>li>a]:py-1 hidden sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0"> <li class="col-span-2"> <a href="/archives">
+posts
+</a> </li> <li class="col-span-2"> <a href="/tags">
+tags
+</a> </li> <li class="col-span-2"> <a href="/about">
+about
+</a> </li> <li class="col-span-2"> <a target="_blank" href="/rss.xml" class="inline-block" aria-label="rss feed" title="RSS Feed"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stroke-accent stroke-3 rtl:-rotate-90"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M4 4a16 16 0 0 1 16 16" /><path d="M4 11a9 9 0 0 1 9 9" /></svg> <span class="sr-only">RSS Feed</span> </a> </li> <li class="col-span-1 flex items-center justify-center"> <a href="/search" title="Search" aria-label="search" class="group inline-flex items-center gap-1 hover:text-accent focus-outline flex p-3 sm:p-1">  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> <span class="sr-only">Search</span>  </a> </li>  </ul> </nav> </div> </header> <script type="module">function s(){const e=document.querySelector("#menu-btn"),t=document.querySelector("#menu-items"),n=document.querySelector("#menu-icon"),o=document.querySelector("#close-icon");!e||!t||!n||!o||e.addEventListener("click",()=>{const c=e.getAttribute("aria-expanded")==="true";e.setAttribute("aria-expanded",c?"false":"true"),e.setAttribute("aria-label",c?"Open Menu":"Close Menu"),t.classList.toggle("hidden"),n.classList.toggle("hidden"),o.classList.toggle("hidden")})}s();document.addEventListener("astro:after-swap",s);</script> <div class="app-layout flex items-center justify-start"><a id="back-button" href="/" class="group inline-flex items-center gap-1 hover:text-accent focus-outline -ms-2 mt-8 mb-2 hover:text-foreground/75"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block size-6 rtl:rotate-180"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M15 6l-6 6l6 6" /></svg><span>Go back</span> </a></div><script type="module">function o(){const t=document.querySelector("#back-button"),e=sessionStorage.getItem("backUrl");e&&t&&(t.href=e)}document.addEventListener("astro:page-load",o);o();</script> <main id="main-content" class="app-layout pb-12" data-pagefind-body> <h1 class="inline-block text-2xl font-bold text-accent sm:text-3xl" data-astro-transition-scope="astro-fam6wyqg-1"> Implementing Asemica: A Markov Chain Based Cipher </h1> <div class="my-2 flex flex-col items-start gap-2 sm:flex-row sm:items-center"> <div class="flex items-center gap-x-2 opacity-80"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block size-6 min-w-5.5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M7 14h.013" /><path d="M10.01 14h.005" /><path d="M13.01 14h.005" /><path d="M16.015 14h.005" /><path d="M13.015 17h.005" /><path d="M7.01 17h.005" /><path d="M10.01 17h.005" /></svg>  <time class="text-sm sm:text-base" datetime="2020-04-15T00:00:01.000Z">15 Apr, 2020</time> </div> <div class="flex items-center gap-x-2 opacity-80"> <span class="hidden text-sm sm:inline sm:text-base">•</span> <span class="text-sm sm:text-base">12 min read</span> </div> <span class="hidden text-sm sm:inline sm:text-base">•</span> <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8"> <li> <a href="/tags/cryptography/" class="flex items-center gap-0.5 font-mono border-b-2 border-dashed border-foreground hover:-mt-0.5 hover:border-accent hover:text-accent focus-visible:border-none focus-visible:text-accent text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-80 size-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 9l14 0" /><path d="M5 15l14 0" /><path d="M11 4l-4 16" /><path d="M17 4l-4 16" /></svg> cryptography <span class="text-gray-300 font-bold">(1)</span> </a> </li><li> <a href="/tags/factor/" class="flex items-center gap-0.5 font-mono border-b-2 border-dashed border-foreground hover:-mt-0.5 hover:border-accent hover:text-accent focus-visible:border-none focus-visible:text-accent text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-80 size-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 9l14 0" /><path d="M5 15l14 0" /><path d="M11 4l-4 16" /><path d="M17 4l-4 16" /></svg> factor <span class="text-gray-300 font-bold">(1)</span> </a> </li> </ul> </div> <article id="article" class="app-prose mt-8 w-full max-w-app prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"> <h2 id="table-of-contents">Table of Contents</h2>
+<p></p><details><summary>Open Table of Contents</summary><p></p>
+<ul>
+<li><a href="#how-asemica-operates">How Asemica Operates</a>
+<ul>
+<li><a href="#encryption">Encryption</a></li>
+<li><a href="#decryption">Decryption</a></li>
+</ul>
+</li>
+<li><a href="#concrete-implementation">Concrete Implementation</a>
+<ul>
+<li><a href="#representing-a-transition">Representing A Transition</a></li>
+<li><a href="#generating-the-transition-table">Generating the Transition Table</a></li>
+<li><a href="#encryption-and-decryption">Encryption and Decryption</a></li>
+</ul>
+</li>
+<li><a href="#appendix">Appendix</a></li>
+</ul>
+<p></p></details><p></p>
+<h2 id="how-asemica-operates">How Asemica Operates</h2>
+<p>Before we begin I’d like to state that the algorithm was formulated by a person called <a href="https://danne.stayskal.com/">Danne
+Stayskal</a> and the original implementation (in Perl) is available in their <a href="https://github.com/linenoise/asemica">GitHub</a> profile. I
+cannot recall how I found it initially but it was only until recently that I decided to try and
+figure out how it works by re-implementing it in a language I am more familiar with.</p>
+<p>The reason I waited until recently to start my re-implementation effort was because of needing to
+learn a bit of Perl to use for scripting on Linux. Perl is a bit famous (infamous?) for being hard
+to read but after only going through a few chapters of <a href="https://isbnsearch.org/isbn/9781491954324">Learning Perl</a> and a healthy amount of
+comments in the original source for Asemica, I was able to understand how it works enough to write
+my own version.</p>
+<p>Asemica relies on a regular document of text as a key. In order to understand how it works it is
+necessary to understand how a document is used as a key. The first step of the Asemica algorithm is
+turning the document key into a table of unique words present in the document. For any given word we
+keep track of all the words that appear directly after it anywhere in the text and how many times
+they do. For ease of reference the sequence of words-that-follow will be called <em>doors</em> and <em>exits</em>
+when the sequence includes the occurrences.</p>
+<p>After this mapping of words and their associated information - which we’ll refer to as the
+<em>transition table</em> - is created, those words with 15 or more different words following it are
+considered <em>meaningful</em> as they are able to represent a half a byte of information. All others are
+considered meaningless. This table is used to carry out both encryption and decryption.</p>
+<h3 id="encryption">Encryption</h3>
+<p>During encryption the plaintext is converted into a sequence of bytes which are further converted
+into binary strings then grouped into half-byte numbers (nibbles)<sup><a href="#user-content-fn-1" id="user-content-fnref-1" data-footnote-ref="" aria-describedby="footnote-label">1</a></sup>. Then beginning a randomly
+chosen word from those present in the document key which we will refer to as a <em>token</em> the following
+series of steps is repeated until the nibble sequence is empty:</p>
+<ul>
+<li>The current <em>token</em> is appended to the ciphertext result string.</li>
+<li>If the token is <em>meaningful</em> then a single value is popped from the sequence of half-byte numbers
+and its integer value used to index the list of <em>doors</em>. This word becomes the next <em>token</em>.</li>
+<li>If the <em>token</em> is not <em>meaningful</em> we randomly pick one of the <em>doors</em> and use that as the <em>token</em>
+in the next iteration.</li>
+</ul>
+<p>As we can see moving from one <em>token</em> to the next is wholly dependent on the value of the previous
+<em>token</em> which is exactly the type of relationship that a Markov chain describes. The probability of
+moving to a state in <em>doors</em> is</p>
+<p>{{ “1/n” | formatMath | safe}}</p>
+<p>where <code>n</code> is the length of the <em>doors</em> sequence and that of moving to a state not in <em>doors</em> is <code>0</code>.</p>
+<h3 id="decryption">Decryption</h3>
+<p>During decryption, the ciphertext is first split into a list of words. The <em>words</em> list is iterated
+over until the second last element and the following steps are carried out:</p>
+<ul>
+<li>Check if the current word is <em>meaningful</em> skipping it otherwise since it could not have been used
+to encode a nibble.</li>
+<li>Try and find the next word’s index within the current word’s <em>doors</em>.</li>
+<li>This index is converted into a binary string and appended to the plaintext result string.</li>
+</ul>
+<p>At the end of the loop the plaintext string is just a long binary string and not the intended
+message. To convert back into whatever was encrypted the binary string is divided into groups of 8
+(binary) characters. These characters represent a single byte and are converted back into the ASCII
+value they represent. The resulting string is the original message.</p>
+<h2 id="concrete-implementation">Concrete Implementation</h2>
+<p>To implement Asemica I chose the <a href="http://factorcode.org">Factor</a> programming language which is described on the homepage
+as:</p>
+<blockquote>
+<p>a concatenative, stack-based programming language with high-level features including dynamic
+types, extensible syntax, macros, and garbage collection.</p>
+</blockquote>
+<p>Apart from the features listed above one more that I think is useful is the <a href="https://docs.factorcode.org/content/article-listener.html">listener</a> -
+basically an enhanced REPL - which is helpful for interactive development.</p>
+<h3 id="representing-a-transition">Representing A Transition</h3>
+<p>The first detail to work out is how to represent the information present in each entry of the
+transition table. For this we’ll use a <a href="https://docs.factorcode.org/content/article-tuple-examples.html">Tuple</a> which is similar to data classes in other
+languages. The syntax is pretty straightforward<sup><a href="#user-content-fn-2" id="user-content-fnref-2" data-footnote-ref="" aria-describedby="footnote-label">2</a></sup>:</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="factor"><code><span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">TUPLE: transition</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">{ token      </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">string </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">}  </span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">! raw string as it  appeared</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">{ seen       </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">integer </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">} </span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">! how many times token has been seen</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">{ door       </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">vector </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">}  </span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">! words after this one in document key</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">{ doors      </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">integer </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">} </span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">! length of door vector</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">{ exits      </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">assoc </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">}   </span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">! words after plus occurrence count</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">meaningful             </span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">! true or false depending if doors > 15 ;</span></span></code></pre>
+<p>The following is a <code>transition</code> value for one word. The key file used was Metamorphosis by Franz
+Kafka downloaded from <a href="https://www.gutenberg.org/">Project Gutenberg</a> as a text file:</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="json"><code><span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">{</span></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#72F088">	"token"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">:</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> "eBook"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#72F088">	"seen"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">:</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 12</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#72F088">	"door"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">:</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6"> [</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">"of"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> "is"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> "or"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> "Details"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> "First"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> "METAMORPHOSIS"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> "complying"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> "for"</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#72F088">	"doors"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">:</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 8</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#72F088">	"exits"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">:</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6"> [</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">		[</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">"of"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 2</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">		[</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">"is"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 2</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">		[</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">"or"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 2</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">		[</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">"Details"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 1</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">		[</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">"First"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 1</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">		[</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">"METAMORPHOSIS"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 2</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">		[</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">"complying"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 1</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">		[</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">"for"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 1</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">	]</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#72F088">	"meaningful"</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">:</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> false</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">}</span></span></code></pre>
+<h3 id="generating-the-transition-table">Generating the Transition Table</h3>
+<p>The next step is actually building the <em>transition table</em>. To do this as we saw earlier requires
+iterating through all the words in the document key and checking which word follows each and
+updating the relevant <code>transition</code> tuple. Rather than using an indexed loop on a single stream of
+tokens I instead opted to use the <code>2each</code> combinator<sup><a href="#user-content-fn-3" id="user-content-fnref-3" data-footnote-ref="" aria-describedby="footnote-label">3</a></sup> which requires two sequences and a
+quotation on the stack. It is roughly equivalent to the following Python snippet:</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="python"><code><span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">def</span><span style="--shiki-light:#6F42C1;--shiki-dark:#DBB7FF"> two_each</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">(</span><span style="--shiki-light:#FF9800;--shiki-dark:#F0F3F6">seq1</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#FF9800;--shiki-dark:#F0F3F6"> seq2</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#FF9800;--shiki-dark:#F0F3F6"> f</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">):</span></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">  for</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6"> a</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">,</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6"> b </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">in</span><span style="--shiki-light:#6F42C1;--shiki-dark:#91CBFF"> zip</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">(seq1, seq2):</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#F0F3F6">    f</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">(a, b)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC"># example usage</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#F0F3F6">two_each</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#91CBFF">range</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">(</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">5</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">), </span><span style="--shiki-light:#6F42C1;--shiki-dark:#91CBFF">range</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">(</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">1</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">, </span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">5</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">), </span><span style="--shiki-light:#6F42C1;--shiki-dark:#91CBFF">print</span><span style="--shiki-light:#212121;--shiki-dark:#F0F3F6">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC"># example output</span></span>
+<span class="line"><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">0</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 1</span></span>
+<span class="line"><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">1</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 2</span></span>
+<span class="line"><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">2</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 3</span></span>
+<span class="line"><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">3</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 4</span></span></code></pre>
+<p>We can already guess how to pair up each word with the one that follows it and run a function on
+it<sup><a href="#user-content-fn-4" id="user-content-fnref-4" data-footnote-ref="" aria-describedby="footnote-label">4</a></sup>.</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="factor"><code><span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">:</span><span style="--shiki-light:#6F42C1;--shiki-dark:#DBB7FF"> 2tokens</span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC"> ( str -- a b )</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    clean-string </span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">" "</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6"> split </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">dup rest </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">::</span><span style="--shiki-light:#6F42C1;--shiki-dark:#DBB7FF"> generate-transitions</span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC"> ( a b -- table )</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    { } </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">>alist </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">:> ttable! </span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">! create empty transition table</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    a b </span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">! tokens</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    [</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        :> value</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        :> key</span></span>
+<span class="line"><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">        ! get transition tuple if it exists or make new one</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        key >lower ttable new-or-existing</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        key >>token</span></span>
+<span class="line"><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">        ! update with information</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        value </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">swap </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">update-transition-info</span></span>
+<span class="line"><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">        ! modify the transition table</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        key >lower ttable assoc-add ttable!</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    ] </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">2each </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">ttable set-meaningful ;</span></span></code></pre>
+<p>The <code>2tokens</code> word produces the two sequences we need from a string after first cleaning the string
+(this is just removing extra spaces and newlines among other things). These two sequences are used
+as input to the <code>generate-transitions</code> word. Unlike most other stack-based programming languages,
+Factor allows using <a href="https://docs.factorcode.org/content/article-locals-examples.html">lexical variables</a> ( <code>::</code>, <code>:></code> ) which can be a lot more convenient than
+manipulating multiple different stack values.</p>
+<h3 id="encryption-and-decryption">Encryption and Decryption</h3>
+<p>The code responsible for encryption is not very complicated if you keep a few of these Factor
+specific things in mind:</p>
+<ul>
+<li>How lexical variables (including mutable ones) <a href="https://docs.factorcode.org/content/article-locals-examples.html">work</a> .</li>
+<li>Arguments to words are taken from the stack.</li>
+<li><code>length</code> does what you expect and <code>index array nth</code> is <code>array[index]</code> in Python.</li>
+<li><code>key assoc at</code> is the same as <code>assoc[key]</code> where <code>assoc</code> would be a dictionary in Python.</li>
+<li><code>seq unclip</code> puts the first element and the rest of the sequence on the stack in reverse order.</li>
+<li><code>meaningful>></code> is just how you access the slot named <code>meaningful</code> in a tuple<sup><a href="#user-content-fn-5" id="user-content-fnref-5" data-footnote-ref="" aria-describedby="footnote-label">5</a></sup>.</li>
+</ul>
+<p>The code for encryption is:</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="factor"><code><span class="line"></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">::</span><span style="--shiki-light:#6F42C1;--shiki-dark:#DBB7FF"> encode</span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC"> ( message transitions tokens -- encmessage )</span></span>
+<span class="line"><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">    ! start with a random token</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    tokens </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">length </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">safe-random tokens </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">nth </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">:> token!</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">    ""</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6"> :> encmessage!</span></span>
+<span class="line"><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">    ! transform input into sequence of nibbles</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    message unpack nibbles :> nbs!</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    [ nbs </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">empty? </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">] [</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        { encmessage token </span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">" "</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6"> } </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">concat </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">encmessage!</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        token >lower transitions </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">at </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">meaningful>></span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        [</span></span>
+<span class="line"><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">            ! encrypt a nibble into a word</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">            nbs </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">unclip</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">            token >lower transitions </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">at </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">door>></span></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">            nth </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">token!</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">            nbs!</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        ]</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        [</span></span>
+<span class="line"><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">         ! add random word to output without encrypting nibble</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">         token >lower transitions </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">at </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">doors>> safe-random</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">         token >lower transitions </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">at </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">door>> </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">nth </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">token!</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        ] </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">if</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    ] </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">until </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">{ encmessage token </span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">" "</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6"> } </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">concat </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">;</span></span></code></pre>
+<p>For the decryption word other than what we have already mentioned keep in mind:</p>
+<ul>
+<li>Although iteration over structures is preferred over indexed iteration the latter is still
+possible by using <code>&#x3C;iota></code> (similar to <code>range</code> in Python) with the <code>each</code> combinator.</li>
+<li><code>find</code> tries to find a value in a sequence that satisfies a quotation and puts the index and the
+value on the stack or false for both.</li>
+<li><code>when</code> is like an if statement without an else section.</li>
+</ul>
+<p>The decryption code is:</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="factor"><code><span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">::</span><span style="--shiki-light:#6F42C1;--shiki-dark:#DBB7FF"> decode</span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC"> ( input transitions tokens -- decmessage )</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">    ""</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6"> :> decoded!</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    input clean-string </span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">" "</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6"> split :> words</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    words </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">length </span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">1 </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">- </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">&#x3C;iota> [</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        :> i</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        i words transitions at-nth meaningful>></span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        [</span></span>
+<span class="line"><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">            ! word encodes a nibble so try and find its value</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">            i words transitions at-nth door>> [</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">                >lower i </span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">1 </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">+ </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">words </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">nth </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">>lower </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">=</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">            ] </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">find</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">            :> elt</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">            :> idx</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">            elt [ idx make-nibble decoded </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">swap append </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">decoded! ] </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">when</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        ] </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">when</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    ] </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">each </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">decoded pack ;</span></span></code></pre>
+<p>One final detail necessary for understanding how encryption and decryption is done is the
+implementation of <code>pack</code> and <code>unpack</code>. They are written to mimic the behaviour of <code>pack</code> and
+<code>unpack</code> in Perl with <code>b*</code> as the template string. Here’s <code>unpack</code>:</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="factor"><code><span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">:</span><span style="--shiki-light:#6F42C1;--shiki-dark:#DBB7FF"> unpack</span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC"> ( str -- newstr )</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">    [ >bin </span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">8 </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">zero-pad </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">reverse </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">] { } </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">map-as </span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">""</span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492"> join </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">;</span></span></code></pre>
+<p>It converts a string such as “hello” into a binary string such as
+“0001011010100110001101100011011011110110”. It does this by converting each character into a binary
+string (<code>>bin</code>) then padding the string with zeros until it is at least length 8 (<code>8 zero-pad</code>). It
+then reverses the string to turn it into little endian form (least significant bit first). The
+result for each character is concatenated together into a single string.</p>
+<p><code>pack</code> is slightly longer:</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="factor"><code><span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">::</span><span style="--shiki-light:#6F42C1;--shiki-dark:#DBB7FF"> pack</span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC"> ( str -- seq )</span></span>
+<span class="line"><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">   0 </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">str </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">length </span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">8 </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">&#x3C;range> [</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        :> </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">start</span></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">        start </span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">8 </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">+ </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">:> end</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        end str </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">length ></span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">        [ str </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">length </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">] [ end ] </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">if</span></span>
+<span class="line"><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">        start swap </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">str </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">subseq reverse </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">bin></span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">   ] { } </span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492">map-as but-last >string </span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">;</span></span></code></pre>
+<p>It converts a string such as “0001011010100110001101100011011011110110” back into “hello”. It does
+this by iterating through the string in groups of 8 characters (representing 1 byte / a single ASCII
+value). The 8 characters form a string which is reversed (to turn it back into big endian form)
+before converting it back into an integer (<code>bin></code>). The result is a sequence of numbers which can
+then be converted into an ASCII string (<code>>string</code>).</p>
+<p>After adding a few other bits and pieces like argument parsing typical usage of the program is shown
+below:</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="shell"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">$</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> echo</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> "Pwagu hupata pwaguzi"</span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757"> factor-vm</span><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF"> -i=cust.img</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> asemica.factor</span><span style="--shiki-light:#24292EFF;--shiki-dark:#FF9492"> \</span></span>
+<span class="line"><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF">  -m</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> enc</span><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF"> -c</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> metamorphosis.txt</span><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF"> -o</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> enc.txt</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">$</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> cat</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> enc.txt</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">them</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> It</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> was</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> ever</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> was</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> ever</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> mentioned</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> as</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> they</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> have</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> expected</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> something</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> to</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">make</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> use</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> several</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> hours</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> on</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> his</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> many</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> steps</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> and</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> if</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> somebody</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> came</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> to</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> make</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">use</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> part</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> and</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> with</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> all</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> at</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> seven</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> I</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">'ll get enough of luxury For help her</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">breast His bed perhaps any moment and when her Would go of an inch His</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">right to just lay flat that gentle voice as clearly asked each other</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">Whatever he thought It</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">$ factor-vm -i=cust.img asemica.factor -m dec \</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">  -c metamorphosis.txt -i enc.txt</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">Pwagu hupata pwaguzi</span></span></code></pre>
+<h2 id="appendix">Appendix</h2>
+<ul>
+<li>The entire code is available on <a href="https://github.com/julius383/asemica-factor">GitHub</a>.</li>
+<li>As described in the <code>README</code> of the GitHub project generating an <a href="https://docs.factorcode.org/content/article-images.html">image</a> and passing it as an
+argument to the factor VM can significantly improve runtimes.</li>
+<li>The choice of document key can lead to shorter ciphertexts with a longer text generally being
+better and some texts being completely unsuitable for use as a key.</li>
+<li>A very good introduction to Factor is available <a href="https://andreaferretti.github.io/factor-tutorial/">here</a>.</li>
+<li><a href="https://evincarofautumn.blogspot.com/2012/02/why-concatenative-programming-matters.html">This</a> article describes some of the reasons why concatenative programming is useful.</li>
+<li>Factor has a lot of libraries so browsing the documentation can usually help you find what you
+want.</li>
+<li>On Linux <code>Alt-+</code> increases the font size for the help browser and running
+<code>"Iosevka Custom" 25 set-listener-font</code> sets the font and its size for the listener.</li>
+</ul>
+<section data-footnotes="" class="footnotes"><h2 class="sr-only" id="footnote-label">Footnotes</h2>
+<ol>
+<li id="user-content-fn-1">
+<p>The bytes represent the value of a particular character in ASCII although Unicode should work as
+well by changing how decoding is done. <a href="#user-content-fnref-1" data-footnote-backref="" aria-label="Back to reference 1" class="data-footnote-backref">↩</a></p>
+</li>
+<li id="user-content-fn-2">
+<p>The types for tuple slots are entirely optional but are useful for documentation. <a href="#user-content-fnref-2" data-footnote-backref="" aria-label="Back to reference 2" class="data-footnote-backref">↩</a></p>
+</li>
+<li id="user-content-fn-3">
+<p>A combinator is a word (function) that takes code as input usually in the form of a quotation
+which is an anonymous function. <a href="#user-content-fnref-3" data-footnote-backref="" aria-label="Back to reference 3" class="data-footnote-backref">↩</a></p>
+</li>
+<li id="user-content-fn-4">
+<p>The first sequence is all the tokens and the second tokens is the same sequence without the
+first element. <a href="#user-content-fnref-4" data-footnote-backref="" aria-label="Back to reference 4" class="data-footnote-backref">↩</a></p>
+</li>
+<li id="user-content-fn-5">
+<p>This would work for any tuple with a slot called <code>meaningful</code> not just our <code>transition</code> tuple. <a href="#user-content-fnref-5" data-footnote-backref="" aria-label="Back to reference 5" class="data-footnote-backref">↩</a></p>
+</li>
+</ol>
+</section> </article> <hr class="my-8 border-dashed"> <div id="btt-btn-container" class="fixed end-4 bottom-8 z-50 md:sticky md:end-auto md:float-end md:me-1 translate-y-14 opacity-0 transition duration-500"> <button data-button="back-to-top" class="group relative bg-background px-2 py-1 size-14 rounded-full shadow-xl md:h-8 md:w-fit md:rounded-md md:shadow-none md:focus-visible:rounded-none md:bg-background/35 md:bg-clip-padding md:backdrop-blur-lg"> <span id="progress-indicator" class="absolute inset-0 -z-10 block size-14 scale-110 rounded-full bg-transparent md:hidden md:h-8 md:rounded-md"></span> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block rotate-90 md:hidden"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M15 6l-6 6l6 6" /></svg> <span class="sr-only text-sm group-hover:text-accent md:not-sr-only"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block size-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M16 9l-4 -4" /><path d="M8 9l4 -4" /></svg>
+Back To Top
+</span> </button> </div> <script data-astro-rerun>
+  /** Scrolls the document to the top when
+   * the "Back to Top" button is clicked. */
+  function backToTop() {
+    const rootElement = document.documentElement;
+    const btnContainer = document.querySelector("#btt-btn-container");
+    const backToTopBtn = document.querySelector("[data-button='back-to-top']");
+    const progressIndicator = document.querySelector("#progress-indicator");
+
+    if (!rootElement || !btnContainer || !backToTopBtn || !progressIndicator)
+      return;
+
+    // Attach click event handler for back-to-top button
+    backToTopBtn.addEventListener("click", () => {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    });
+
+    // Handle button visibility according to scroll position
+    let lastVisible = null;
+    function handleScroll() {
+      const scrollTotal = rootElement.scrollHeight - rootElement.clientHeight;
+      const scrollTop = rootElement.scrollTop;
+      const scrollPercent = Math.floor((scrollTop / scrollTotal) * 100);
+
+      progressIndicator.style.setProperty(
+        "background-image",
+        `conic-gradient(var(--accent), var(--accent) ${scrollPercent}%, transparent ${scrollPercent}%)`
+      );
+
+      const isVisible = scrollTop / scrollTotal > 0.3;
+
+      if (isVisible !== lastVisible) {
+        btnContainer.classList.toggle("opacity-100", isVisible);
+        btnContainer.classList.toggle("translate-y-0", isVisible);
+        btnContainer.classList.toggle("opacity-0", !isVisible);
+        btnContainer.classList.toggle("translate-y-14", !isVisible);
+        lastVisible = isVisible;
+      }
+    }
+
+    let ticking = false;
+    document.addEventListener("scroll", () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  }
+  backToTop();
+</script> <hr class="my-6 border-dashed"> <!-- Previous/Next Post Buttons --> <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2"> <a href="/posts/2020-09-30-tips-for-an-improved-arch-linux-experience" class="flex w-full gap-1 hover:opacity-75"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block flex-none rtl:rotate-180"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M15 6l-6 6l6 6" /></svg> <div> <span>Previous Post</span> <div class="text-sm text-accent/85">Tips For An Improved Arch Linux Experience</div> </div> </a> <a href="/posts/2020-04-05-querying-pacman-with-datalog" class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"> <div> <span>Next Post</span> <div class="text-sm text-accent/85">Querying Pacman with Datalog</div> </div> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block flex-none rtl:rotate-180"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 6l6 6l-6 6" /></svg> </a> </div> </main> <footer class="app-layout mt-auto"> <div class="py-6 sm:py-4 border-t border-border flex flex-col items-center justify-between sm:flex-row-reverse"> <div class="flex flex-wrap items-center gap-1"> <a href="https://github.com/julius383" title="Julius on GitHub" class="group inline-flex items-center gap-1 hover:text-accent p-2 hover:rotate-6 sm:p-1">  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" /></svg> <span class="sr-only">Julius on GitHub</span>  </a><a href="mailto:kibunjiajulius@gmail.com" title="Send an email to Julius Kibunjia's Blog" class="group inline-flex items-center gap-1 hover:text-accent p-2 hover:rotate-6 sm:p-1">  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg> <span class="sr-only">Send an email to Julius Kibunjia&#39;s Blog</span>  </a> </div> <div class="my-2 flex flex-col items-center whitespace-nowrap sm:flex-row"> <span>Copyright Julius Kibunjia &#169; 2026</span> <span class="hidden sm:inline">&nbsp;|&nbsp;</span> <span>All rights reserved.</span> </div> </div> </footer>  <!-- Load full theme logic --> <script type="module">const a="theme",c="light",d="dark",i="dark";function l(){const e=localStorage.getItem(a);return e||i}let t=window.theme?.themeValue??l();function r(){localStorage.setItem(a,t),o()}function o(){document.firstElementChild?.setAttribute("data-theme",t),document.querySelector("#theme-btn")?.setAttribute("aria-label",t);const e=document.body;if(e){const n=window.getComputedStyle(e).backgroundColor;document.querySelector("meta[name='theme-color']")?.setAttribute("content",n)}}window.theme?(window.theme.setPreference=r,window.theme.reflectPreference=o):window.theme={themeValue:t,setPreference:r,reflectPreference:o,getTheme:()=>t,setTheme:e=>{t=e}};o();function s(){o(),document.querySelector("#theme-btn")?.addEventListener("click",()=>{t=t===c?d:c,window.theme?.setTheme(t),r()})}s();document.addEventListener("astro:after-swap",s);document.addEventListener("astro:before-swap",e=>{const m=e,n=document.querySelector("meta[name='theme-color']")?.getAttribute("content");n&&m.newDocument.querySelector("meta[name='theme-color']")?.setAttribute("content",n)});window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",({matches:e})=>{t=e?d:c,window.theme?.setTheme(t),r()});</script> <!-- Image Zoom overlay --> <script type="module">function o(){const e=document.createElement("div");e.id="zoom-overlay",document.body.appendChild(e),document.querySelectorAll("img.zoomable-img").forEach(t=>{t.addEventListener("click",()=>{e.innerHTML=`<img src="${t.src}" alt="${t.alt}" />`,e.classList.add("active")})}),e.addEventListener("click",()=>{e.classList.remove("active")})}document.addEventListener("astro:page-load",o);</script>  </body></html> <script data-astro-rerun>
+  /** Create a progress indicator
+   *  at the top */
+  function createProgressBar() {
+    // Create the main container div
+    const progressContainer = document.createElement("div");
+    progressContainer.className =
+      "progress-container fixed top-0 z-10 h-1 w-full bg-background";
+
+    // Create the progress bar div
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar h-1 w-0 bg-accent";
+    progressBar.id = "myBar";
+
+    // Append the progress bar to the progress container
+    progressContainer.appendChild(progressBar);
+
+    // Append the progress container to the document body or any other desired parent element
+    document.body.appendChild(progressContainer);
+  }
+  createProgressBar();
+
+  /** Update the progress bar
+   *  when user scrolls */
+  function updateScrollProgress() {
+    document.addEventListener("scroll", () => {
+      const winScroll =
+        document.body.scrollTop || document.documentElement.scrollTop;
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      if (document) {
+        const myBar = document.getElementById("myBar");
+        if (myBar) {
+          myBar.style.width = scrolled + "%";
+        }
+      }
+    });
+  }
+  updateScrollProgress();
+
+  /** Attaches links to headings in the document,
+   *  allowing sharing of sections easily */
+  function addHeadingLinks() {
+    const headings = Array.from(
+      document.querySelectorAll("h2, h3, h4, h5, h6")
+    );
+    for (const heading of headings) {
+      heading.classList.add("group");
+      const link = document.createElement("a");
+      link.className =
+        "heading-link ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100";
+      link.href = "#" + heading.id;
+
+      const span = document.createElement("span");
+      span.ariaHidden = "true";
+      span.innerText = "#";
+      link.appendChild(span);
+      heading.appendChild(link);
+    }
+  }
+  addHeadingLinks();
+
+  /** Attaches copy buttons to code blocks in the document,
+   * allowing users to copy code easily. */
+  function attachCopyButtons() {
+    const copyButtonLabel = "Copy";
+    const codeBlocks = Array.from(document.querySelectorAll("pre"));
+
+    for (const codeBlock of codeBlocks) {
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+
+      // Check if --file-name-offset custom property exists
+      const computedStyle = getComputedStyle(codeBlock);
+      const hasFileNameOffset =
+        computedStyle.getPropertyValue("--file-name-offset").trim() !== "";
+
+      // Determine the top positioning class
+      const topClass = hasFileNameOffset
+        ? "top-(--file-name-offset)"
+        : "-top-3";
+
+      const copyButton = document.createElement("button");
+      copyButton.className = `copy-code absolute end-3 ${topClass} rounded bg-muted border border-muted px-2 py-1 text-xs leading-4 text-foreground font-medium`;
+      copyButton.innerHTML = copyButtonLabel;
+      codeBlock.setAttribute("tabindex", "0");
+      codeBlock.appendChild(copyButton);
+
+      // wrap codebock with relative parent element
+      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
+      wrapper.appendChild(codeBlock);
+
+      copyButton.addEventListener("click", async () => {
+        await copyCode(codeBlock, copyButton);
+      });
+    }
+
+    async function copyCode(block, button) {
+      const code = block.querySelector("code");
+      const text = code?.innerText;
+
+      await navigator.clipboard.writeText(text ?? "");
+
+      // visual feedback that task is completed
+      button.innerText = "Copied";
+
+      setTimeout(() => {
+        button.innerText = copyButtonLabel;
+      }, 700);
+    }
+  }
+  attachCopyButtons();
+
+  /* Go to page start after page swap */
+  document.addEventListener("astro:after-swap", () =>
+    window.scrollTo({ left: 0, top: 0, behavior: "instant" })
+  );
+</script>

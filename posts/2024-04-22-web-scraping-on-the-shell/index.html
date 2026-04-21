@@ -1,0 +1,473 @@
+<!DOCTYPE html><html dir="ltr" lang="en" class="scroll-smooth"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="canonical" href="https://julius383.github.io/posts/2024-04-22-web-scraping-on-the-shell/"><meta name="generator" content="Astro v5.18.1"><!-- Load Font --><style>@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/b92787725bce141b.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:300;font-style:normal;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/07431a16dd76433e.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:400;font-style:normal;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/fe8426e418b1784b.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:500;font-style:normal;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/c5c4490645b295f5.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:600;font-style:normal;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/ffa1f1149b7accfe.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:700;font-style:normal;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/49b9cca8ada37f9e.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:300;font-style:italic;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/6577f535eac5545d.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:400;font-style:italic;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/b6299e19d0ae9382.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:500;font-style:italic;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/8988ce21ae98ae3f.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:600;font-style:italic;}@font-face{font-family:Inter-d49f7dbfaf5600d7;src:url("/_astro/fonts/25cb2d9b508ca44d.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:700;font-style:italic;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:300;font-style:normal;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:normal;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:500;font-style:normal;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:600;font-style:normal;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:700;font-style:normal;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:300;font-style:italic;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:400;font-style:italic;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:500;font-style:italic;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:600;font-style:italic;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}@font-face{font-family:"Inter-d49f7dbfaf5600d7 fallback: Arial";src:local("Arial");font-display:swap;font-weight:700;font-style:italic;size-adjust:105.1479%;ascent-override:92.1322%;descent-override:22.9402%;line-gap-override:0%;}:root{--font-inter:Inter-d49f7dbfaf5600d7,"Inter-d49f7dbfaf5600d7 fallback: Arial",sans-serif;}</style><link rel="preload" href="/_astro/fonts/07431a16dd76433e.woff2" as="font" type="font/woff2" crossorigin><style>@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/79260fa6547b8044.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:300;font-style:normal;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/cc5f60fd46e42cc9.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:400;font-style:normal;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/c8db80b9ce092d76.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:500;font-style:normal;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/626901e254b0251a.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:600;font-style:normal;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/4e13c01b98043a1e.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:700;font-style:normal;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/ba5c1fe9d3cc5168.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:300;font-style:italic;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/9161ee1cbda9cef9.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:400;font-style:italic;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/68c599f82a0105a9.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:500;font-style:italic;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/8dfad69e269bdbee.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:600;font-style:italic;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd";src:url("/_astro/fonts/fb2c38a94b4de7ed.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:700;font-style:italic;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:300;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:400;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:500;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:600;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:700;font-style:normal;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:300;font-style:italic;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:400;font-style:italic;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:500;font-style:italic;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:600;font-style:italic;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}@font-face{font-family:"JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New";src:local("Courier New");font-display:swap;font-weight:700;font-style:italic;size-adjust:99.9837%;ascent-override:102.0166%;descent-override:30.0049%;}:root{--font-jb-mono:"JetBrains Mono-c6e61e86b6cee3fd","JetBrains Mono-c6e61e86b6cee3fd fallback: Courier New",monospace;}</style><link rel="preload" href="/_astro/fonts/cc5f60fd46e42cc9.woff2" as="font" type="font/woff2" crossorigin><!-- General Meta Tags --><title>Web Scraping on the Shell | Julius Kibunjia&#39;s Blog</title><meta name="title" content="Web Scraping on the Shell | Julius Kibunjia's Blog"><meta name="description" content="Often times there's data on the internet we'd like to get our hands on. In most cases I'd start on a Python script with the usual suspects requests, beautifulsoup4, json or csv. This works well butwhen the task in question only needs to be run once, it would be alot easier to run a few commands on the shell."><meta name="author" content="Julius Kibunjia"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="Web Scraping on the Shell | Julius Kibunjia's Blog"><meta property="og:description" content="Often times there's data on the internet we'd like to get our hands on. In most cases I'd start on a Python script with the usual suspects requests, beautifulsoup4, json or csv. This works well butwhen the task in question only needs to be run once, it would be alot easier to run a few commands on the shell."><meta property="og:url" content="https://julius383.github.io/posts/2024-04-22-web-scraping-on-the-shell/"><meta property="og:image" content="https://julius383.github.io/astropaper-og.jpg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"><!-- Article Published/Modified time --><meta property="article:published_time" content="2024-04-22T00:00:01.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://julius383.github.io/posts/2024-04-22-web-scraping-on-the-shell/"><meta property="twitter:title" content="Web Scraping on the Shell | Julius Kibunjia's Blog"><meta property="twitter:description" content="Often times there's data on the internet we'd like to get our hands on. In most cases I'd start on a Python script with the usual suspects requests, beautifulsoup4, json or csv. This works well butwhen the task in question only needs to be run once, it would be alot easier to run a few commands on the shell."><meta property="twitter:image" content="https://julius383.github.io/astropaper-og.jpg"><!-- Google JSON-LD Structured data --><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Web Scraping on the Shell | Julius Kibunjia's Blog","image":"https://julius383.github.io/astropaper-og.jpg","datePublished":"2024-04-22T00:00:01.000Z","author":[{"@type":"Person","name":"Julius Kibunjia","url":"https://julius383.github.io"}]}</script><!-- Enable RSS feed auto-discovery  --><!-- https://docs.astro.build/en/recipes/rss/#enabling-rss-feed-auto-discovery --><link rel="alternate" type="application/rss+xml" title="Julius Kibunjia's Blog" href="https://julius383.github.io/rss.xml"><meta name="theme-color" content=""><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.CDGfc0hd.js"></script><!-- Minimal inline script to prevent FOUC - sets theme immediately --><script>
+      (function () {
+        const initialColorScheme = ""; // "light" | "dark"
+        const currentTheme = localStorage.getItem("theme");
+
+        function getPreferTheme() {
+          if (currentTheme) return currentTheme;
+          if (initialColorScheme) return initialColorScheme;
+          return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+
+        const themeValue = getPreferTheme();
+
+        // Set theme immediately to prevent flash
+        document.firstElementChild?.setAttribute("data-theme", themeValue);
+
+        // Export minimal API for external script
+        window.theme = {
+          themeValue: themeValue,
+          getTheme: () => window.theme.themeValue,
+          setTheme: val => {
+            window.theme.themeValue = val;
+          },
+        };
+      })();
+    </script><link rel="stylesheet" href="/_astro/about.CosKmhfb.css">
+<style>:where([data-astro-image]){object-fit:var(--fit);object-position:var(--pos);height:auto}:where([data-astro-image=full-width]){width:100%}:where([data-astro-image=constrained]){max-width:100%}
+@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0;mix-blend-mode:plus-lighter}to{opacity:1;mix-blend-mode:plus-lighter}}@keyframes astroFadeOut{0%{opacity:1;mix-blend-mode:plus-lighter}to{opacity:0;mix-blend-mode:plus-lighter}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media(prefers-reduced-motion){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}
+</style><style>[data-astro-transition-scope="astro-fam6wyqg-1"] { view-transition-name: web-scraping-on-the-shell; }@layer astro { ::view-transition-old(web-scraping-on-the-shell) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(web-scraping-on-the-shell) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(web-scraping-on-the-shell) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(web-scraping-on-the-shell) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-fam6wyqg-1"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-fam6wyqg-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-fam6wyqg-1"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-fam6wyqg-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-fam6wyqg-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-fam6wyqg-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-fam6wyqg-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-fam6wyqg-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style><style>[data-astro-transition-scope="astro-36ssibgs-2"] { view-transition-name: linux; }@layer astro { ::view-transition-old(linux) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(linux) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(linux) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(linux) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style><style>[data-astro-transition-scope="astro-36ssibgs-3"] { view-transition-name: shell; }@layer astro { ::view-transition-old(shell) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(shell) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(shell) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(shell) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-3"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-3"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style><style>[data-astro-transition-scope="astro-36ssibgs-4"] { view-transition-name: web-scraping; }@layer astro { ::view-transition-old(web-scraping) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(web-scraping) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(web-scraping) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(web-scraping) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-4"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-4"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-4"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-4"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-4"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-4"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-4"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-4"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style></head> <body>  <a id="skip-to-content" href="#main-content" class="absolute start-16 -top-full z-50 bg-background px-3 py-2 text-accent backdrop-blur-lg transition-all focus:top-4">
+Skip to content
+</a> <header class="app-layout flex flex-col items-center justify-between sm:flex-row"> <div id="top-nav-wrap" class="py-4 sm:py-6 border-b border-border relative w-full bg-background flex items-baseline justify-between sm:items-center"> <a href="/" class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"> Julius Kibunjia&#39;s Blog </a> <nav id="nav-menu" class="flex w-full flex-col items-center sm:ms-2 sm:flex-row sm:justify-end sm:space-x-4 sm:py-0"> <button id="menu-btn" class="focus-outline self-end p-2 sm:hidden" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden" id="close-icon"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-menu-deep" id="menu-icon"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 6h16" /><path d="M7 12h13" /><path d="M10 18h10" /></svg> </button> <ul id="menu-items" class="mt-4 grid w-44 grid-cols-2 place-content-center gap-2 [&#38;>li>a]:block [&#38;>li>a]:px-4 [&#38;>li>a]:py-3 [&#38;>li>a]:text-center [&#38;>li>a]:font-medium [&#38;>li>a]:hover:text-accent sm:[&#38;>li>a]:px-2 sm:[&#38;>li>a]:py-1 hidden sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0"> <li class="col-span-2"> <a href="/archives">
+posts
+</a> </li> <li class="col-span-2"> <a href="/tags">
+tags
+</a> </li> <li class="col-span-2"> <a href="/about">
+about
+</a> </li> <li class="col-span-2"> <a target="_blank" href="/rss.xml" class="inline-block" aria-label="rss feed" title="RSS Feed"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stroke-accent stroke-3 rtl:-rotate-90"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M4 4a16 16 0 0 1 16 16" /><path d="M4 11a9 9 0 0 1 9 9" /></svg> <span class="sr-only">RSS Feed</span> </a> </li> <li class="col-span-1 flex items-center justify-center"> <a href="/search" title="Search" aria-label="search" class="group inline-flex items-center gap-1 hover:text-accent focus-outline flex p-3 sm:p-1">  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg> <span class="sr-only">Search</span>  </a> </li>  </ul> </nav> </div> </header> <script type="module">function s(){const e=document.querySelector("#menu-btn"),t=document.querySelector("#menu-items"),n=document.querySelector("#menu-icon"),o=document.querySelector("#close-icon");!e||!t||!n||!o||e.addEventListener("click",()=>{const c=e.getAttribute("aria-expanded")==="true";e.setAttribute("aria-expanded",c?"false":"true"),e.setAttribute("aria-label",c?"Open Menu":"Close Menu"),t.classList.toggle("hidden"),n.classList.toggle("hidden"),o.classList.toggle("hidden")})}s();document.addEventListener("astro:after-swap",s);</script> <div class="app-layout flex items-center justify-start"><a id="back-button" href="/" class="group inline-flex items-center gap-1 hover:text-accent focus-outline -ms-2 mt-8 mb-2 hover:text-foreground/75"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block size-6 rtl:rotate-180"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M15 6l-6 6l6 6" /></svg><span>Go back</span> </a></div><script type="module">function o(){const t=document.querySelector("#back-button"),e=sessionStorage.getItem("backUrl");e&&t&&(t.href=e)}document.addEventListener("astro:page-load",o);o();</script> <main id="main-content" class="app-layout pb-12" data-pagefind-body> <h1 class="inline-block text-2xl font-bold text-accent sm:text-3xl" data-astro-transition-scope="astro-fam6wyqg-1"> Web Scraping on the Shell </h1> <div class="my-2 flex flex-col items-start gap-2 sm:flex-row sm:items-center"> <div class="flex items-center gap-x-2 opacity-80"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block size-6 min-w-5.5"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M7 14h.013" /><path d="M10.01 14h.005" /><path d="M13.01 14h.005" /><path d="M16.015 14h.005" /><path d="M13.015 17h.005" /><path d="M7.01 17h.005" /><path d="M10.01 17h.005" /></svg>  <time class="text-sm sm:text-base" datetime="2024-04-22T00:00:01.000Z">22 Apr, 2024</time> </div> <div class="flex items-center gap-x-2 opacity-80"> <span class="hidden text-sm sm:inline sm:text-base">•</span> <span class="text-sm sm:text-base">5 min read</span> </div> <span class="hidden text-sm sm:inline sm:text-base">•</span> <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8"> <li> <a href="/tags/linux/" class="flex items-center gap-0.5 font-mono border-b-2 border-dashed border-foreground hover:-mt-0.5 hover:border-accent hover:text-accent focus-visible:border-none focus-visible:text-accent text-sm" data-astro-transition-scope="astro-36ssibgs-2"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-80 size-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 9l14 0" /><path d="M5 15l14 0" /><path d="M11 4l-4 16" /><path d="M17 4l-4 16" /></svg> linux <span class="text-gray-300 font-bold">(5)</span> </a> </li><li> <a href="/tags/shell/" class="flex items-center gap-0.5 font-mono border-b-2 border-dashed border-foreground hover:-mt-0.5 hover:border-accent hover:text-accent focus-visible:border-none focus-visible:text-accent text-sm" data-astro-transition-scope="astro-36ssibgs-3"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-80 size-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 9l14 0" /><path d="M5 15l14 0" /><path d="M11 4l-4 16" /><path d="M17 4l-4 16" /></svg> shell <span class="text-gray-300 font-bold">(4)</span> </a> </li><li> <a href="/tags/web-scraping/" class="flex items-center gap-0.5 font-mono border-b-2 border-dashed border-foreground hover:-mt-0.5 hover:border-accent hover:text-accent focus-visible:border-none focus-visible:text-accent text-sm" data-astro-transition-scope="astro-36ssibgs-4"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-80 size-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 9l14 0" /><path d="M5 15l14 0" /><path d="M11 4l-4 16" /><path d="M17 4l-4 16" /></svg> web-scraping <span class="text-gray-300 font-bold">(1)</span> </a> </li> </ul> </div> <article id="article" class="app-prose mt-8 w-full max-w-app prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"> <h2 id="table-of-contents">Table of Contents</h2>
+<p></p><details><summary>Open Table of Contents</summary><p></p>
+<ul>
+<li><a href="#making-web-requests-with-curl-and-shot-scraper">Making Web Requests with curl and shot-scraper</a></li>
+<li><a href="#extracting-data-from-html-with-pup">Extracting Data From HTML with pup</a></li>
+<li><a href="#wrangling-data-with-fx-and-jq">Wrangling Data with fx and jq</a></li>
+<li><a href="#wrapping-up">Wrapping Up</a></li>
+</ul>
+<p></p></details><p></p>
+<h2 id="making-web-requests-with-curl-and-shot-scraper">Making Web Requests with curl and shot-scraper</h2>
+<p><a href="https://curl.se/">cURL</a> is as useful as it is ubiquitous meaning there’s a very good chance it’s
+already present on your system. Using it is also simple enough <code>curl https://example.com</code> fetches a
+page and prints the result to standard output. Here’s a few other useful arguments:</p>
+<ul>
+<li><code>-o, --output path/to/file</code> for saving the result of the request to a specific file. You can just
+as easily use redirection.</li>
+<li><code>-L, --location</code> which tells <code>curl</code> to make a request to the new location if the server reports
+that the page has moved with a <code>3XX</code> response.</li>
+<li><code>-H, --header 'User-Agent: yes-please/2000'</code> for providing additional headers to include in the
+request.</li>
+<li><code>-f, --fail</code> useful in scripts since it tells curl to produce no output on server errors.</li>
+</ul>
+<p><code>curl</code> obviously supports a lot more arguments but I’ve found that the few above alongside the
+default behaviour is sufficient for most cases.</p>
+<p><a href="https://shot-scraper.datasette.io/en/stable/index.html">shot-scraper</a> is a great tool that offers a
+lot of flexibility in handling websites. The original purpose I believe was to simplify taking
+screenshots of webpages but it is capable of a lot more. It uses <code>playwright</code> to open the URL in a
+headless browser. The first point of interest is the <code>javascript</code> sub-command which allows you to
+directly extract parts of a page on the command-line.</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="sh"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">shot-scraper</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> javascript</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> 'https://example.com'</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> 'document.title'</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">"Example Domain"</span></span></code></pre>
+<p>The sub-command also supports passing a JavaScript file which you can go crazy with.</p>
+<p>I normally use it to download pages that do not immediately have all the content available after the
+page loads. The <code>--wait</code> argument tells <code>shot-scraper</code> to delay a number of milliseconds before
+proceeding with further processing.</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="sh"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">shot-scraper</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> html</span><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF"> --wait</span><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF"> 2000</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> 'https://example.com'</span><span style="--shiki-light:#24292EFF;--shiki-dark:#FF9492">\</span></span>
+<span class="line"><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF">    --output</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> /path/to/file</span></span></code></pre>
+<p>There’s also a <code>--wait-for</code> argument that allows you to wait until a specific JavaScript expression
+returns true.</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="sh"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">shot-scraper</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> https://.../</span><span style="--shiki-light:#24292EFF;--shiki-dark:#FF9492"> \</span></span>
+<span class="line"><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF">  --wait-for</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> 'document.querySelector("div#content")'</span></span></code></pre>
+<h2 id="extracting-data-from-html-with-pup">Extracting Data From HTML with pup</h2>
+<p>Working with text on the command-line is often done with tools such as <code>grep</code>, <code>cut</code> and <code>awk</code>. This
+approach would be ill-advised for HTML text which is a structured format and contains a lot of extra
+text surrounding what is relevant. Being a structured format is however beneficial since we can rely
+on the shape of the document to find <strong>exactly</strong> what we’re looking for.</p>
+<p>Enter <a href="https://github.com/EricChiang/pup">pup</a> which allows you to filter parts of a HTML document
+using <a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors">CSS Selectors</a>
+which should be familiar to anyone who’s ever had to style a web page. Here’s an example of finding
+the links to the latest articles published on this website.</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="sh"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">curl</span><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF"> -s</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> https://julius383.github.io/</span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757"> pup</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> 'a.title attr{href}'</span></span></code></pre>
+<p>The full list of supported selectors can be found on the
+<a href="https://github.com/EricChiang/pup?tab=readme-ov-file#implemented-selectors">GitHub</a> page. I didn’t
+run into compatibility issues and you could copy the CSS selector for a part of a page directly from
+your browser as-is.</p>
+<p>Another useful feature of <code>pup</code> is the functions such as <code>attr{href}</code> above which is used to get the
+value of a particular tag’s attribute. There’s also a <code>text{}</code> function which does what you’d expect
+and the <code>json{}</code> function which prints HTML as JSON.</p>
+<h2 id="wrangling-data-with-fx-and-jq">Wrangling Data with fx and jq</h2>
+<p>Data wrangling on the shell is really a topic that deserves it’s own article (coming soon) so I’ll
+only go over some simple stuff for now. Probably the most useful tool is
+<a href="https://jqlang.github.io/jq/">jq</a>, a command-line JSON processor. Although the syntax can take some
+getting used to, it is still pretty useful overall.</p>
+<p>Let’s say you just got a JSON file from somewhere, you first need to understand the schema. You can
+print out the JSON file on the terminal with <code>cat</code>, but for nicer output use:</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="sh"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">curl</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> https://pokeapi.co/api/v2/pokemon/ditto</span><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF"> -o</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> ditto.json</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">jq</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> '.'</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> ditto.json</span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757"> less</span><span style="--shiki-light:#C2C3C5;--shiki-dark:#BDC4CC">    # or</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">python</span><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF"> -m</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> json.tool</span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492"> &#x3C;</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> ditto.json</span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757"> less</span></span></code></pre>
+<p>Even better is using <a href="https://github.com/antonmedv/fx">fx</a> a terminal JSON viewer. It allows you to
+collapse objects and arrays, copy keys and values and has syntax highlighting.</p>
+<p>After getting a general overview of the JSON we can start trying to get a deeper understanding of
+the structure. A simple way to do this is with the <code>keys</code> function in <code>jq</code> which just returns an
+array of the keys present in an object.</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="sh"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">jq</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> 'keys'</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> ditto.json</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">[</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">  "abilities"</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">  "base_experience"</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">  ...,</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">  "stats"</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">  "types"</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">  "weight"</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span></span></code></pre>
+<p>If you instead want to find the keys present for all objects in an array:</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="sh"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">jq</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> '.stats | map(keys) | add | unique | sort'</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> ditto.json</span></span></code></pre>
+<p>Accessing a field is done using <code>.fieldname</code>, you can use <code>map</code> to access a field of objects in an
+array.</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="sh"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757">jq</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> '.stats | map([.stat.name, .base_stat])'</span><span style="--shiki-light:#2B5581;--shiki-dark:#ADDCFF"> ditto.json</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">[</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">  [</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">    "hp"</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">    48</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">  ],</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">  [</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">    "attack"</span><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">,</span></span>
+<span class="line"><span style="--shiki-light:#1976D2;--shiki-dark:#91CBFF">    48</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">  ],</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">  ...</span></span>
+<span class="line"><span style="--shiki-light:#24292EFF;--shiki-dark:#F0F3F6">]</span></span></code></pre>
+<p><a href="https://paweldu.dev/posts/fzf-live-repl/">jnv</a> provides a more interactive <code>jq</code> experience, however
+you can achieve a similar result with <code>fzf</code> using a trick I first saw mentioned on
+<a href="https://paweldu.dev/posts/fzf-live-repl/">this</a> website.</p>
+<pre class="astro-code astro-code-themes min-light github-dark-high-contrast" style="--shiki-light:#24292eff;--shiki-dark:#f0f3f6;--shiki-light-bg:#ffffff;--shiki-dark-bg:#0a0c10; overflow-x: auto;--file-name-offset: -0.75rem;" tabindex="0" data-language="sh"><code><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#91CBFF">echo</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF"> ''</span><span style="--shiki-light:#D32F2F;--shiki-dark:#FF9492"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#FFB757"> fzf</span><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF"> --preview=</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">"jq --color-output {q} ditto.json"</span><span style="--shiki-light:#24292EFF;--shiki-dark:#FF9492"> \</span></span>
+<span class="line"><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF">    --preview-window=70%</span><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF"> --print-query</span><span style="--shiki-light:#2B5581;--shiki-dark:#91CBFF"> --query=</span><span style="--shiki-light:#22863A;--shiki-dark:#ADDCFF">'.'</span></span></code></pre>
+<h2 id="wrapping-up">Wrapping Up</h2>
+<p>The benefit of doing any task in a shell environment is the easy access to plenty of well-written,
+well-documented and useful tools. With that said something like Python or Clojure is a lot less
+painful for writing robust tools that will see more extensive usage. The key is knowing when to make
+the switch. Hopefully this article has helped push the boundary in favour of using the shell more.</p>
+<ul>
+<li>My article about
+<a href="https://julius383.github.io/posts-output/2019-03-22-data-flow-on-the-shell/">Data Flow on the Shell</a>
+would be useful for anyone interested in tips for processing data with shell tools.</li>
+<li>Another very useful command is <code>sponge</code> from the <a href="https://joeyh.name/code/moreutils/">moreutils</a>
+package which allows you to make changes to a file <em>in-place</em> e.g
+<code>jq '.' ditto.json | sponge ditto.json</code> pretty prints JSON from a file and writes it back into the
+same file.</li>
+</ul> </article> <hr class="my-8 border-dashed"> <div id="btt-btn-container" class="fixed end-4 bottom-8 z-50 md:sticky md:end-auto md:float-end md:me-1 translate-y-14 opacity-0 transition duration-500"> <button data-button="back-to-top" class="group relative bg-background px-2 py-1 size-14 rounded-full shadow-xl md:h-8 md:w-fit md:rounded-md md:shadow-none md:focus-visible:rounded-none md:bg-background/35 md:bg-clip-padding md:backdrop-blur-lg"> <span id="progress-indicator" class="absolute inset-0 -z-10 block size-14 scale-110 rounded-full bg-transparent md:hidden md:h-8 md:rounded-md"></span> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block rotate-90 md:hidden"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M15 6l-6 6l6 6" /></svg> <span class="sr-only text-sm group-hover:text-accent md:not-sr-only"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block size-4"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M16 9l-4 -4" /><path d="M8 9l4 -4" /></svg>
+Back To Top
+</span> </button> </div> <script data-astro-rerun>
+  /** Scrolls the document to the top when
+   * the "Back to Top" button is clicked. */
+  function backToTop() {
+    const rootElement = document.documentElement;
+    const btnContainer = document.querySelector("#btt-btn-container");
+    const backToTopBtn = document.querySelector("[data-button='back-to-top']");
+    const progressIndicator = document.querySelector("#progress-indicator");
+
+    if (!rootElement || !btnContainer || !backToTopBtn || !progressIndicator)
+      return;
+
+    // Attach click event handler for back-to-top button
+    backToTopBtn.addEventListener("click", () => {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    });
+
+    // Handle button visibility according to scroll position
+    let lastVisible = null;
+    function handleScroll() {
+      const scrollTotal = rootElement.scrollHeight - rootElement.clientHeight;
+      const scrollTop = rootElement.scrollTop;
+      const scrollPercent = Math.floor((scrollTop / scrollTotal) * 100);
+
+      progressIndicator.style.setProperty(
+        "background-image",
+        `conic-gradient(var(--accent), var(--accent) ${scrollPercent}%, transparent ${scrollPercent}%)`
+      );
+
+      const isVisible = scrollTop / scrollTotal > 0.3;
+
+      if (isVisible !== lastVisible) {
+        btnContainer.classList.toggle("opacity-100", isVisible);
+        btnContainer.classList.toggle("translate-y-0", isVisible);
+        btnContainer.classList.toggle("opacity-0", !isVisible);
+        btnContainer.classList.toggle("translate-y-14", !isVisible);
+        lastVisible = isVisible;
+      }
+    }
+
+    let ticking = false;
+    document.addEventListener("scroll", () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  }
+  backToTop();
+</script> <hr class="my-6 border-dashed"> <!-- Previous/Next Post Buttons --> <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2"> <a href="/posts/2024-06-17-using-a-star-and-python-to-solve-a-puzzle" class="flex w-full gap-1 hover:opacity-75"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block flex-none rtl:rotate-180"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M15 6l-6 6l6 6" /></svg> <div> <span>Previous Post</span> <div class="text-sm text-accent/85">Using A* and Python to Solve a Puzzle</div> </div> </a> <a href="/posts/2023-11-27-using-a-genetic-algorithm-to-guess-arithmetic-equations-in-julia" class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"> <div> <span>Next Post</span> <div class="text-sm text-accent/85">Using a Genetic Algorithm to Guess Arithmetic Equations in Julia</div> </div> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block flex-none rtl:rotate-180"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 6l6 6l-6 6" /></svg> </a> </div> </main> <footer class="app-layout mt-auto"> <div class="py-6 sm:py-4 border-t border-border flex flex-col items-center justify-between sm:flex-row-reverse"> <div class="flex flex-wrap items-center gap-1"> <a href="https://github.com/julius383" title="Julius on GitHub" class="group inline-flex items-center gap-1 hover:text-accent p-2 hover:rotate-6 sm:p-1">  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" /></svg> <span class="sr-only">Julius on GitHub</span>  </a><a href="mailto:kibunjiajulius@gmail.com" title="Send an email to Julius Kibunjia's Blog" class="group inline-flex items-center gap-1 hover:text-accent p-2 hover:rotate-6 sm:p-1">  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg> <span class="sr-only">Send an email to Julius Kibunjia&#39;s Blog</span>  </a> </div> <div class="my-2 flex flex-col items-center whitespace-nowrap sm:flex-row"> <span>Copyright Julius Kibunjia &#169; 2026</span> <span class="hidden sm:inline">&nbsp;|&nbsp;</span> <span>All rights reserved.</span> </div> </div> </footer>  <!-- Load full theme logic --> <script type="module">const a="theme",c="light",d="dark",i="dark";function l(){const e=localStorage.getItem(a);return e||i}let t=window.theme?.themeValue??l();function r(){localStorage.setItem(a,t),o()}function o(){document.firstElementChild?.setAttribute("data-theme",t),document.querySelector("#theme-btn")?.setAttribute("aria-label",t);const e=document.body;if(e){const n=window.getComputedStyle(e).backgroundColor;document.querySelector("meta[name='theme-color']")?.setAttribute("content",n)}}window.theme?(window.theme.setPreference=r,window.theme.reflectPreference=o):window.theme={themeValue:t,setPreference:r,reflectPreference:o,getTheme:()=>t,setTheme:e=>{t=e}};o();function s(){o(),document.querySelector("#theme-btn")?.addEventListener("click",()=>{t=t===c?d:c,window.theme?.setTheme(t),r()})}s();document.addEventListener("astro:after-swap",s);document.addEventListener("astro:before-swap",e=>{const m=e,n=document.querySelector("meta[name='theme-color']")?.getAttribute("content");n&&m.newDocument.querySelector("meta[name='theme-color']")?.setAttribute("content",n)});window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",({matches:e})=>{t=e?d:c,window.theme?.setTheme(t),r()});</script> <!-- Image Zoom overlay --> <script type="module">function o(){const e=document.createElement("div");e.id="zoom-overlay",document.body.appendChild(e),document.querySelectorAll("img.zoomable-img").forEach(t=>{t.addEventListener("click",()=>{e.innerHTML=`<img src="${t.src}" alt="${t.alt}" />`,e.classList.add("active")})}),e.addEventListener("click",()=>{e.classList.remove("active")})}document.addEventListener("astro:page-load",o);</script>  </body></html> <script data-astro-rerun>
+  /** Create a progress indicator
+   *  at the top */
+  function createProgressBar() {
+    // Create the main container div
+    const progressContainer = document.createElement("div");
+    progressContainer.className =
+      "progress-container fixed top-0 z-10 h-1 w-full bg-background";
+
+    // Create the progress bar div
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar h-1 w-0 bg-accent";
+    progressBar.id = "myBar";
+
+    // Append the progress bar to the progress container
+    progressContainer.appendChild(progressBar);
+
+    // Append the progress container to the document body or any other desired parent element
+    document.body.appendChild(progressContainer);
+  }
+  createProgressBar();
+
+  /** Update the progress bar
+   *  when user scrolls */
+  function updateScrollProgress() {
+    document.addEventListener("scroll", () => {
+      const winScroll =
+        document.body.scrollTop || document.documentElement.scrollTop;
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      if (document) {
+        const myBar = document.getElementById("myBar");
+        if (myBar) {
+          myBar.style.width = scrolled + "%";
+        }
+      }
+    });
+  }
+  updateScrollProgress();
+
+  /** Attaches links to headings in the document,
+   *  allowing sharing of sections easily */
+  function addHeadingLinks() {
+    const headings = Array.from(
+      document.querySelectorAll("h2, h3, h4, h5, h6")
+    );
+    for (const heading of headings) {
+      heading.classList.add("group");
+      const link = document.createElement("a");
+      link.className =
+        "heading-link ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100";
+      link.href = "#" + heading.id;
+
+      const span = document.createElement("span");
+      span.ariaHidden = "true";
+      span.innerText = "#";
+      link.appendChild(span);
+      heading.appendChild(link);
+    }
+  }
+  addHeadingLinks();
+
+  /** Attaches copy buttons to code blocks in the document,
+   * allowing users to copy code easily. */
+  function attachCopyButtons() {
+    const copyButtonLabel = "Copy";
+    const codeBlocks = Array.from(document.querySelectorAll("pre"));
+
+    for (const codeBlock of codeBlocks) {
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+
+      // Check if --file-name-offset custom property exists
+      const computedStyle = getComputedStyle(codeBlock);
+      const hasFileNameOffset =
+        computedStyle.getPropertyValue("--file-name-offset").trim() !== "";
+
+      // Determine the top positioning class
+      const topClass = hasFileNameOffset
+        ? "top-(--file-name-offset)"
+        : "-top-3";
+
+      const copyButton = document.createElement("button");
+      copyButton.className = `copy-code absolute end-3 ${topClass} rounded bg-muted border border-muted px-2 py-1 text-xs leading-4 text-foreground font-medium`;
+      copyButton.innerHTML = copyButtonLabel;
+      codeBlock.setAttribute("tabindex", "0");
+      codeBlock.appendChild(copyButton);
+
+      // wrap codebock with relative parent element
+      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
+      wrapper.appendChild(codeBlock);
+
+      copyButton.addEventListener("click", async () => {
+        await copyCode(codeBlock, copyButton);
+      });
+    }
+
+    async function copyCode(block, button) {
+      const code = block.querySelector("code");
+      const text = code?.innerText;
+
+      await navigator.clipboard.writeText(text ?? "");
+
+      // visual feedback that task is completed
+      button.innerText = "Copied";
+
+      setTimeout(() => {
+        button.innerText = copyButtonLabel;
+      }, 700);
+    }
+  }
+  attachCopyButtons();
+
+  /* Go to page start after page swap */
+  document.addEventListener("astro:after-swap", () =>
+    window.scrollTo({ left: 0, top: 0, behavior: "instant" })
+  );
+</script>
